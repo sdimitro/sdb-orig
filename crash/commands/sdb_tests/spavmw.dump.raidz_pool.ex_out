@@ -1,0 +1,292 @@
+ ADDR           NAME
+------------------------------------------------------------
+0xffff8c6ca3f9c000 rpool
+      ADDR               STATE   AUX  DESCRIPTION
+      ------------------------------------------------------------
+      0xffff8c6ca4a34000 HEALTHY NONE  root
+      0xffff8c6ca4734000 HEALTHY NONE    /dev/sda1
+            ID ACTIVE ALGORITHM FRAG      ALLOC      MAXSZ       WEIGHT
+           -----------------------------------------------------------------
+             0    -      SPACE     -   220M (43%)         0B        582MB
+             1    -      SPACE     -   210M (41%)         0B        601MB
+             2    -      SPACE     -   507M (99%)         0B          8MB
+             3    -      SPACE     -   508M (99%)         0B          7MB
+             4    -      SPACE     -   509M (99%)         0B          4MB
+             5    -      SPACE     -   510M (99%)         0B          3MB
+             6    -      SPACE     -   222M (43%)         0B        566MB
+             7    -      SPACE     -   511M (99%)         0B          1MB
+             8    -      SPACE     -   322M (63%)         0B        367MB
+             9    -      SPACE     -   510M (99%)         0B          3MB
+            10    S L    SPACE     -   198M (38%)      301MB        604MB
+            11    -      SPACE     -   507M (99%)         0B          8MB
+            12    -      SPACE     -   197M (38%)         0B        602MB
+            13    - L    SPACE     -   194M (38%)      316MB        604MB
+            14    -      SPACE     -   202M (39%)         0B        587MB
+            15    -      SPACE     -   208M (40%)         0B        574MB
+            16    -      SPACE     -   215M (42%)         0B        558MB
+            17    -      SPACE     -   503M (98%)         0B         15MB
+            18    -      SPACE     -   503M (98%)         0B         15MB
+            19    -      SPACE     -   508M (99%)         0B          7MB
+            20    -      SPACE     -   508M (99%)         0B          7MB
+            21    -      SPACE     -   510M (99%)         0B          3MB
+            22    -      SPACE     -   510M (99%)         0B          1MB
+            23    -      SPACE     -   194M (37%)         0B        583MB
+            24    -      SPACE     -   504M (98%)         0B         13MB
+            25    -      SPACE     -   447M (87%)         0B        117MB
+            26    -      SPACE     -   225M (44%)         0B        518MB
+            27    -      SPACE     -   510M (99%)         0B          3MB
+            28    -      SPACE     -   506M (98%)         0B          9MB
+            29    -      SPACE     -   508M (99%)         0B          5MB
+            30    -      SPACE     -   507M (99%)         0B          7MB
+            31    -      SPACE     -   277M (54%)         0B        416MB
+            32    -      SPACE     -   510M (99%)         0B          2MB
+            33    -      SPACE     -   510M (99%)         0B          2MB
+            34    -      SPACE     -   510M (99%)         0B          3MB
+            35    -      SPACE     -   510M (99%)         0B          2MB
+            36    -      SPACE     -   506M (98%)         0B          8MB
+            37    -      SPACE     -   508M (99%)         0B          6MB
+            38    -      SPACE     -   264M (51%)         0B        426MB
+            39    -      SPACE     -   506M (98%)         0B         10MB
+            40    -      SPACE     -   162M (31%)         0B        597MB
+            41    -      SPACE     -   507M (99%)         0B          7MB
+            42    -      SPACE     -   510M (99%)         0B          2MB
+            43    -      SPACE     -   509M (99%)         0B          3MB
+            44    -      SPACE     -   168M (32%)         0B        578MB
+            45    P L    SPACE     -   191M (37%)      280MB        537MB
+            46    S L    SPACE     -   145M (28%)      339MB        611MB
+            47    -      SPACE     -   507M (99%)         0B          7MB
+            48    - L    SPACE     -   146M (28%)      363MB        604MB
+            49    P L    SPACE     -   247M (48%)        9MB        435MB
+            50    -      SPACE     -   511M (99%)         0B          1MB
+            51    -      SPACE     -   505M (98%)         0B         10MB
+            52    -      SPACE     -   509M (99%)         0B          3MB
+            53    - L    SPACE     -   127M (24%)      210MB        622MB
+            54    -      SPACE     -   151M (29%)         0B        581MB
+            55    -      SPACE     -   510M (99%)         0B          3MB
+            56    -      SPACE     -   192M (37%)         0B        509MB
+            57    -      SPACE     -   137M (26%)         0B        595MB
+            58    -      SPACE     -   510M (99%)         0B          2MB
+            59    -      SPACE     -   423M (82%)         0B        140MB
+            60    -      SPACE     -   138M (27%)         0B        585MB
+            61    -      SPACE     -   511M (99%)         0B          1MB
+            62    -      SPACE     -   135M (26%)         0B        585MB
+            63    -      SPACE     -   244M (47%)         0B        413MB
+            64    - L    SPACE     -   109M (21%)      308MB        619MB
+            65    -      SPACE     -   508M (99%)         0B          4MB
+            66    -      SPACE     -   322M (63%)         0B        288MB
+            67    -      SPACE     -   156M (30%)         0B        538MB
+            68    P L    SPACE     -   191M (37%)       37MB        484MB
+            69    -      SPACE     -   510M (99%)         0B          1MB
+            70    -      SPACE     -   511M (99%)         0B          1MB
+            71    -      SPACE     -   511M (99%)         0B          1MB
+            72    -      SPACE     -   126M (24%)         0B        571MB
+            73    -      SPACE     -   175M (34%)         0B        495MB
+            74    -      SPACE     -   102M (20%)         0B        600MB
+            75    -      SPACE     -   510M (99%)         0B          1MB
+            76    -      SPACE     -   104M (20%)         0B        591MB
+            77    -      SPACE     -   506M (99%)         0B          7MB
+            78    -      SPACE     -    91M (17%)         0B        604MB
+            79    -      SPACE     -   510M (99%)         0B          2MB
+            80    -      SPACE     -   264M (51%)         0B        352MB
+            81    -      SPACE     -   510M (99%)         0B          1MB
+            82    -      SPACE     -   507M (99%)         0B          6MB
+            83    -      SPACE     -   510M (99%)         0B          2MB
+            84    P L    SPACE     -   132M (25%)      319MB        529MB
+            85    S L    SPACE     -    64M (12%)      421MB        621MB
+            86    -      SPACE     -   510M (99%)         0B          2MB
+            87    S L    SPACE     -    66M (13%)      424MB        611MB
+            88    -      SPACE     -    84M (16%)         0B        584MB
+            89    -      SPACE     -   510M (99%)         0B          2MB
+            90    -      SPACE     -   508M (99%)         0B          4MB
+            91    -      SPACE     -   510M (99%)         0B          1MB
+            92    -      SPACE     -    69M (13%)         0B        591MB
+            93    -      SPACE     -    74M (14%)         0B        581MB
+            94    - L    SPACE     -    46M  (9%)      386MB        616MB
+            95    -      SPACE     -   510M (99%)         0B          1MB
+            96    -      SPACE     -    61M (12%)         0B        589MB
+            97    -      SPACE     -   508M (99%)         0B          3MB
+            98    -      SPACE     -    49M  (9%)         0B        598MB
+            99    -      SPACE     -   506M (98%)         0B          6MB
+           100    -      SPACE     -   507M (99%)         0B          5MB
+           101    -      SPACE     -   503M (98%)         0B         10MB
+           102    -      SPACE     -   504M (98%)         0B          8MB
+           103    -      SPACE     -   507M (99%)         0B          5MB
+           104    -      SPACE     -   506M (98%)         0B          7MB
+           105    -      SPACE     -   510M (99%)         0B          1MB
+           106    C L    SPACE     -    23M  (4%)      459MB        604MB
+           107    -      SPACE     -   506M (98%)         0B          7MB
+           108    -      SPACE     -    54M (10%)         0B        559MB
+           109    -      SPACE     -   511M (99%)         0B          1MB
+           110    -      SPACE     -   510M (99%)         0B          1MB
+           111    -      SPACE     -   508M (99%)         0B          3MB
+           112    -      SPACE     -   506M (98%)         0B          6MB
+           113    -      SPACE     -   507M (99%)         0B          5MB
+           114    -      SPACE     -     0M  (0%)         0B        604MB
+           115    -      SPACE     -     0M  (0%)         0B        600MB
+           116    -      SPACE     -     0M  (0%)         0B        596MB
+           117    -      SPACE     -     0M  (0%)         0B        593MB
+           118    -      SPACE     -     0M  (0%)         0B        589MB
+           119    -      SPACE     -     0M  (0%)         0B        585MB
+           120    -      SPACE     -     0M  (0%)         0B        581MB
+           121    -      SPACE     -     0M  (0%)         0B        578MB
+           122    -      SPACE     -     0M  (0%)         0B        574MB
+           123    -      SPACE     -     0M  (0%)         0B        570MB
+           124    -      SPACE     -     0M  (0%)         0B        567MB
+           125    -      SPACE     -     0M  (0%)         0B        563MB
+           126    -      SPACE     -     0M  (0%)         0B        559MB
+           127    -      SPACE     -     0M  (0%)         0B        556MB
+           128    -      SPACE     -     0M  (0%)         0B        552MB
+           129    -      SPACE     -     0M  (0%)         0B        548MB
+           130    -      SPACE     -     0M  (0%)         0B        545MB
+           131    -      SPACE     -     0M  (0%)         0B        541MB
+           132    -      SPACE     -     0M  (0%)         0B        537MB
+           133    -      SPACE     -     0M  (0%)         0B        534MB
+           134    -      SPACE     -     0M  (0%)         0B        530MB
+           135    -      SPACE     -     0M  (0%)         0B        526MB
+           136    -      SPACE     -     0M  (0%)         0B        523MB
+           137    -      SPACE     -     0M  (0%)         0B        519MB
+           138    -      SPACE     -     0M  (0%)         0B        515MB
+0xffff8c6bcbc08000 tank
+      ADDR               STATE   AUX  DESCRIPTION
+      ------------------------------------------------------------
+      0xffff8c6bc97a0000 HEALTHY NONE  root
+      0xffff8c6bc0890000 HEALTHY NONE    raidz
+            ID ACTIVE ALGORITHM FRAG      ALLOC      MAXSZ       WEIGHT
+           -----------------------------------------------------------------
+             0    P L  SEGMENT   0%     2M  (0%)      506MB    1 x 256MB
+             1    -    SEGMENT   0%   447M (87%)         0B     1 x 32MB
+             2    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+             3    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+             4    -    SEGMENT   0%   382M (74%)         0B     1 x 64MB
+             5    S L  SEGMENT   0%     0M  (0%)      511MB    1 x 256MB
+             6    -    SEGMENT   0%   383M (74%)         0B     1 x 64MB
+             7    -    SEGMENT   0%   383M (74%)         0B     1 x 64MB
+             8    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+             9    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            10    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            11    - L  SEGMENT   0%   448M (87%)       63MB     1 x 32MB
+            12    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            13    - L  SEGMENT   0%   448M (87%)       63MB     1 x 32MB
+            14    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            15    P L  SEGMENT   0%   284M (55%)      227MB    1 x 128MB
+            16    - L  SEGMENT   4%   444M (86%)       63MB     1 x 32MB
+            17    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            18    P L  SEGMENT   0%   350M (68%)      161MB    1 x 128MB
+            19    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            20    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            21    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            22    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            23    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            24    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            25    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            26    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            27    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            28    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            29    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            30    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            31    -    SEGMENT   0%   256M (50%)         0B    1 x 128MB
+            32    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            33    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            34    -    SEGMENT   0%   256M (50%)         0B    1 x 128MB
+            35    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            36    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            37    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            38    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            39    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            40    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            41    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            42    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            43    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            44    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            45    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            46    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            47    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            48    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            49    - L  SEGMENT   0%   383M (74%)      127MB     1 x 64MB
+            50    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            51    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            52    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            53    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            54    S L  SEGMENT   0%     0M  (0%)      511MB    1 x 256MB
+            55    S L  SEGMENT   0%     0M  (0%)      510MB    1 x 256MB
+            56    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            57    S L  SEGMENT   0%     0M  (0%)      511MB    1 x 256MB
+            58    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            59    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            60    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            61    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            62    P L  SEGMENT   0%   238M (46%)      272MB    1 x 256MB
+      0xffff8c6bc089c000 HEALTHY NONE      /dev/sdb1
+      0xffff8c6bdab48000 HEALTHY NONE      /dev/sdc1
+      0xffff8c6bc5cc8000 HEALTHY NONE      /dev/sdd1
+      0xffff8c6bc6f4c000 HEALTHY NONE      /dev/sde1
+      0xffff8c6bc6f5c000 HEALTHY NONE    raidz
+            ID ACTIVE ALGORITHM FRAG      ALLOC      MAXSZ       WEIGHT
+           -----------------------------------------------------------------
+             0    P L  SEGMENT   0%     2M  (0%)      506MB    1 x 256MB
+             1    -    SEGMENT   0%   447M (87%)         0B     1 x 32MB
+             2    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+             3    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+             4    -    SEGMENT   0%   382M (74%)         0B     1 x 64MB
+             5    S L  SEGMENT   0%     0M  (0%)      510MB    1 x 256MB
+             6    S L  SEGMENT   0%     0M  (0%)      511MB    1 x 256MB
+             7    S L  SEGMENT   0%     0M  (0%)      511MB    1 x 256MB
+             8    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+             9    - L  SEGMENT   0%   448M (87%)       63MB     1 x 32MB
+            10    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            11    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            12    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            13    - L  SEGMENT   0%   448M (87%)       63MB     1 x 32MB
+            14    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            15    - L  SEGMENT   0%   447M (87%)       64MB     1 x 64MB
+            16    - L  SEGMENT   4%   444M (86%)       63MB     1 x 32MB
+            17    - L  SEGMENT   0%   447M (87%)       63MB     1 x 32MB
+            18    P L  SEGMENT   0%   340M (66%)      171MB    1 x 128MB
+            19    P L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            20    P L  SEGMENT   0%   368M (72%)      142MB    1 x 128MB
+            21    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            22    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            23    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            24    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            25    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            26    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            27    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            28    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            29    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            30    -    SEGMENT   0%   256M (50%)         0B    1 x 128MB
+            31    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            32    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            33    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            34    -    SEGMENT   0%   256M (50%)         0B    1 x 128MB
+            35    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            36    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            37    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            38    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            39    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            40    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            41    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            42    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            43    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            44    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            45    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            46    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            47    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            48    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            49    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            50    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            51    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            52    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            53    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            54    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            55    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            56    S L  SEGMENT   0%     0M  (0%)      511MB    1 x 256MB
+            57    - L  SEGMENT   0%   254M (49%)      255MB    1 x 128MB
+            58    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            59    -    SEGMENT   0%   255M (49%)         0B    1 x 128MB
+            60    - L  SEGMENT   0%   255M (49%)      255MB    1 x 128MB
+            61    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+            62    - L  SEGMENT   0%   256M (50%)      255MB    1 x 128MB
+      0xffff8c6bc6f50000 HEALTHY NONE      /dev/sdf1
+      0xffff8c6bc5b9c000 HEALTHY NONE      /dev/sdg1
+      0xffff8c6bdedac000 HEALTHY NONE      /dev/sdh1
+      0xffff8c6bdede4000 HEALTHY NONE      /dev/sdi1

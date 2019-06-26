@@ -1,0 +1,11 @@
+                 addr   object  lvl    blkid holds os
+  0xffff9313be6743a8        0    0        3     3 rpool/ROOT/delphix.PYzTvsX/home
+  0xffff9313ba9d9000        0    0        3     8 MOS
+  0xffff93130bf3ec30      222    0        3     0 MOS
+  0xffff9313e44fc000        0    0        3    32 MOS
+  0xffff9313dd360ea0       11    0        3     0 MOS
+  0xffff9313cb2c6d68        0    0        3    32 rpool/ROOT/delphix.PYzTvsX/data
+  0xffff93130f887270     1411    0        3     0 rpool/ROOT/delphix.PYzTvsX/data
+  0xffff93137074b750        0    0        3    32 rpool/ROOT/delphix.PYzTvsX/root
+  0xffff9313f521bc30        0    1        3   423 rpool/ROOT/delphix.PYzTvsX/root
+  0xffff9313de53ed68        0    1        3     6 rpool/ROOT/delphix.PYzTvsX/data

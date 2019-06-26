@@ -1,0 +1,14 @@
+ ADDR           NAME
+------------------------------------------------------------
+0xffff9313e4300000 rpool
+      ADDR               STATE   AUX  DESCRIPTION
+      ------------------------------------------------------------
+      0xffff9313e4534000 HEALTHY NONE  root
+      0xffff9313e4664000 HEALTHY NONE    /dev/sda1
+0xffff931325f20000 tank
+      ADDR               STATE   AUX  DESCRIPTION
+      ------------------------------------------------------------
+      0xffff931315b58000 HEALTHY NONE  root
+      0xffff93133a030000 HEALTHY NONE    /dev/sdb1
+      0xffff931326cb8000 HEALTHY NONE    /dev/sdc1
+      0xffff93130b2d4000 HEALTHY NONE    /dev/sdd1
