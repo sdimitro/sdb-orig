@@ -19,10 +19,11 @@ class REPL(object):
             return results[state] + " "
         return custom_complete
 
-    def __init__(self, vocabulary, prompt='> ', closing = ''):
+    def __init__(self, target, vocabulary, prompt='> ', closing = ''):
         self.prompt = prompt
         self.closing = closing
         self.vocabulary = vocabulary
+        self.target = target
         readline.parse_and_bind('tab: complete')
         readline.set_completer(REPL.__make_completer(vocabulary))
 
@@ -30,10 +31,16 @@ class REPL(object):
         while True:
             try:
                 s = input(self.prompt).strip()
-                self.vocabulary[s].invoke("")
+                tokens = s.split()
+                cmd = tokens[0]
+                args = ''
+                if len(tokens) > 1:
+                    args = tokens[1:]
+                self.vocabulary[cmd].invoke(self.target, args)
             except (EOFError, KeyboardInterrupt) as e:
                 print(self.closing)
                 break
             except KeyError as e:
-                print('sdb: cannot recongnize command: {}'.format(s))
+                if s != '':
+                    print('sdb: cannot recognize command: {}'.format(cmd))
 

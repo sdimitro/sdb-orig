@@ -29,8 +29,10 @@ class SDBCommand(object):
             SDBCommand.__registerCommand(cls.cmdName, cls)
 
     @classmethod
-    def invoke(cls, args):
+    def invoke(cls, prog, args):
         print('error: unimplemented command')
+
+from sdb.command import SDBCommand
 
 class TestCmd(SDBCommand):
     cmdName = "zfs_dbgmsg"
@@ -39,15 +41,16 @@ class TestCmd(SDBCommand):
         super().__init__(TestCmd.cmdName)
 
     @classmethod
-    def invoke(cls, argstr):
-        print("command output 0")
+    def invoke(cls, prog, argstr):
+        proc_list = prog['zfs_dbgmsgs'].pl_list
+        print(proc_list.address_of_())
 
 class EchoCmd(SDBCommand):
     cmdName = "echo"
 
     def __init__(self):
-        super().__init__(TestCmd.cmdName)
+        super().__init__(EchoCmd.cmdName)
 
     @classmethod
-    def invoke(cls, args):
-        print("args: " + str(args))
+    def invoke(cls, prog, args):
+        print(str(" ".join(args)))
