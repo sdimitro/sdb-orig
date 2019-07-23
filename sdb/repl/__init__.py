@@ -1,4 +1,5 @@
 import readline
+from sdb.command import SDBCommand
 
 class REPL(object):
     """
@@ -31,12 +32,7 @@ class REPL(object):
         while True:
             try:
                 s = input(self.prompt).strip()
-                tokens = s.split()
-                cmd = tokens[0]
-                args = ''
-                if len(tokens) > 1:
-                    args = tokens[1:]
-                self.vocabulary[cmd].invoke(self.target, args)
+                SDBCommand.invoke(self.target, s)
             except (EOFError, KeyboardInterrupt) as e:
                 print(self.closing)
                 break
