@@ -32,6 +32,8 @@ class REPL(object):
         while True:
             try:
                 s = input(self.prompt).strip()
+                if len(s) == 0:
+                    continue
                 SDBCommand.invoke(self.target, s)
             except (EOFError, KeyboardInterrupt) as e:
                 print(self.closing)

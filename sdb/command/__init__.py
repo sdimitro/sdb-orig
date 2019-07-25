@@ -256,8 +256,9 @@ class Walker(PipeableCommand):
 # walker based on the type of the input data.
 class Walk(PipeableCommand):
     cmdName = 'walk'
-    def __init__(self, arg : str = "") -> None:
-        super().__init__()
+    def __init__(self, prog : drgn.Program, args : str = '') -> None:
+        super().__init__(prog, args)
+        self.args = args
 
     def call(self, input : Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         baked = [ (self.prog.type(k), c) for k, c in Walker.allWalkers.items() ]
@@ -897,3 +898,49 @@ class ZfsDbgmsg(SDBCommand):
         list_addr = proc_list.address_of_()
         for node in SDBCommand.executePipeline(self.prog, [list_addr], [List(self.prog), Cast(self.prog, 'zfs_dbgmsg_t *')]):
             ZfsDbgmsg.print_msg(node, self.verbosity >= 1, self.verbosity >= 2)
+
+##############################################################################
+# Experimental
+##############################################################################
+
+class Echo(PipeableCommand):
+    cmdName = ['echo', 'cc']
+    def __init__(self, prog : drgn.Program, args : str = '') -> None:
+        super().__init__(prog, args)
+        self.args = args
+
+    def call(self, input : Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        for arg in self.args.split():
+            yield drgn.Object(self.prog, 'void *', value=int(arg, 0))
+        for o in input:
+            yield o
+
+def is_hex(s : str) -> bool:
+    try:
+        int(s, 16)
+        return True
+    except ValueError:
+        return False
+
+def resolve_for_address(prog : drgn.Program, arg : str) -> drgn.Object:
+    if is_hex(arg):
+        return drgn.Object(prog, 'void *', value=int(arg, 16))
+    else:
+        return prog[arg].address_of_()
+
+class Address(PipeableCommand):
+    cmdName = ['address', 'addr']
+    def __init__(self, prog : drgn.Program, args : str = '') -> None:
+        super().__init__(prog, args)
+        self.args = args
+
+    def call(self, input : Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        if len(self.args) > 0:
+            for arg in self.args.split():
+                yield resolve_for_address(self.prog, arg)
+        else:
+            for i in input:
+                assert i.address_of_() is not None
+                yield i.address_of_()
+
+# TODO: Proper error-handling everywhere
