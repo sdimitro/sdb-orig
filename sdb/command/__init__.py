@@ -944,6 +944,9 @@ class Address(PipeableCommand):
                 yield i.address_of_()
 
 class Member(PipeableCommand):
+    """
+    This is an example help message
+    """
     cmdName = 'member'
     def __init__(self, prog : drgn.Program, args : str = '') -> None:
         super().__init__(prog, args)
@@ -957,5 +960,23 @@ class Member(PipeableCommand):
                 for m in members:
                     retObject = retObject.member_(m)
             yield retObject
+
+class Help(SDBCommand):
+    cmdName = "help"
+
+    def __init__(self, prog : drgn.Program, args : str = '') -> None:
+        super().__init__(prog, args)
+        self.args = args
+
+    def call(self, input : Iterable[drgn.Object]) -> None:
+        if len(self.args) == 0:
+            print('syntax: help <command>')
+            return
+        for cmd in self.args.split():
+            if cmd in allSDBCommands:
+                print(cmd)
+                print(allSDBCommands[cmd].__doc__)
+            else:
+                print("command " + cmd + " doesn't exist")
 
 # TODO: Proper error-handling everywhere
