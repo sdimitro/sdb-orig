@@ -10,6 +10,7 @@ import sys
 from sdb.repl import REPL
 from sdb.command import allSDBCommands
 
+
 def main():
     prog = drgn.Program()
     prog.set_kernel()
@@ -19,6 +20,7 @@ def main():
         print(str(e), file=sys.stderr)
     repl = REPL(prog, allSDBCommands)
     repl.run()
+
 
 if __name__ == '__main__':
     main()

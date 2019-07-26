@@ -1,6 +1,7 @@
 import readline
 from sdb.command import SDBCommand
 
+
 class REPL(object):
     """
     XXX: High-level comment
@@ -14,13 +15,14 @@ class REPL(object):
         def custom_complete(text, state):
             # None is returned for the end of the completion session.
             results = [x for x in vocabulary if x.startswith(text)] + [None]
-            # A space is added to the completion since the Python readline doesn't
-            # do this on its own. When a word is fully completed we want to mimic
-            # the default readline library behavior of adding a space after it.
+            # A space is added to the completion since the Python readline
+            # doesn't do this on its own. When a word is fully completed we
+            # want to mimic the default readline library behavior of adding
+            # a space after it.
             return results[state] + " "
         return custom_complete
 
-    def __init__(self, target, vocabulary, prompt='> ', closing = ''):
+    def __init__(self, target, vocabulary, prompt='> ', closing=''):
         self.prompt = prompt
         self.closing = closing
         self.vocabulary = vocabulary
@@ -35,10 +37,6 @@ class REPL(object):
                 if len(s) == 0:
                     continue
                 SDBCommand.invoke(self.target, s)
-            except (EOFError, KeyboardInterrupt) as e:
+            except (EOFError, KeyboardInterrupt):
                 print(self.closing)
                 break
-            except KeyError as e:
-                if s != '':
-                    print('sdb: cannot recognize command: {}'.format(cmd))
-
