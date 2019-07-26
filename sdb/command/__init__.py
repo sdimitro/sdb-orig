@@ -943,4 +943,19 @@ class Address(PipeableCommand):
                 assert i.address_of_() is not None
                 yield i.address_of_()
 
+class Member(PipeableCommand):
+    cmdName = 'member'
+    def __init__(self, prog : drgn.Program, args : str = '') -> None:
+        super().__init__(prog, args)
+        self.args = args
+
+    def call(self, input : Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        members = self.args.split()
+        for o in input:
+            retObject = o
+            if len(members) != 0:
+                for m in members:
+                    retObject = retObject.member_(m)
+            yield retObject
+
 # TODO: Proper error-handling everywhere
