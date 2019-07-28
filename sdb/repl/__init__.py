@@ -1,17 +1,24 @@
+# -*- coding: utf-8 -*-
+"""This module exists solely for the REPL class"""
 import readline
 from sdb.command import SDBCommand
 
 
-class REPL(object):
+class REPL:
     """
-    XXX: High-level comment
-    XXX: Point out that it kinda blows that the readline library
-         enforces global state.
+    The class that provides the REPL for sdb. It is essentially a wrapper
+    on top of readline and is the place where current and future
+    enhancements in the interactivity of sdb should be placed (e.g.
+    autocompletion, history, etc...).
     """
 
     @staticmethod
     def __make_completer(vocabulary):
-        """ XXX: proper attribution """
+        """
+        Attribution:
+        The following completer code came from Eli Berdensky's blog
+        released under the public domain.
+        """
         def custom_complete(text, state):
             # None is returned for the end of the completion session.
             results = [x for x in vocabulary if x.startswith(text)] + [None]
@@ -31,10 +38,13 @@ class REPL(object):
         readline.set_completer(REPL.__make_completer(vocabulary))
 
     def run(self):
+        """
+        Starts a REPL session.
+        """
         while True:
             try:
                 s = input(self.prompt).strip()
-                if len(s) == 0:
+                if not s:
                     continue
                 SDBCommand.invoke(self.target, s)
             except (EOFError, KeyboardInterrupt):

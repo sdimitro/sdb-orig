@@ -1060,6 +1060,11 @@ class Member(PipeableCommand):
 
 
 class Help(SDBCommand):
+    """
+    syntax: help <command> [<command> ...]
+
+    Prints the help message of the command(s) specified.
+    """
     cmdName = "help"
 
     def __init__(self, prog: drgn.Program, args: str = '') -> None:
@@ -1068,13 +1073,14 @@ class Help(SDBCommand):
 
     def call(self, input: Iterable[drgn.Object]) -> None:
         if len(self.args) == 0:
-            print('syntax: help <command>')
+            print('syntax: help <command> [<command> ...]')
             return
         for cmd in self.args.split():
             if cmd in allSDBCommands:
                 print(cmd)
+                if allSDBCommands[cmd].__doc__ is None:
+                    print("\n    <undocumented>\n")
+                    return
                 print(allSDBCommands[cmd].__doc__)
             else:
                 print("command " + cmd + " doesn't exist")
-
-# TODO: Proper error-handling everywhere

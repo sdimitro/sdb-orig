@@ -2,9 +2,8 @@
 
 ### Disclaimer
 
-This is an experimental repo created under my personal account for
-demonstration purposes. By no means the code in this repo should be
-considered complete or used in a production environment.
+The project is currently in alpha stage under heavy development and
+should not be considered complete or used in a production environment.
 
 ---
 
