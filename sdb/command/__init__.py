@@ -10,8 +10,7 @@ import shlex
 import subprocess
 import sys
 import traceback
-from typing import (Callable, Dict, Iterable, List, Optional, Type, TypeVar,
-                    Union)
+from typing import Callable, Dict, Iterable, List, Optional, Type, TypeVar, Union
 
 import drgn
 

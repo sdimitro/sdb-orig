@@ -20,11 +20,5 @@ $ python3 -m pip install black
 $ black sdb
 ```
 
-* [isort](https://github.com/timothycrosley/isort)
-```
-$ python3 -m pip install isort
-$ isort --resursive sdb
-```
-
-`pylint` and `yapf` are also used to some extend, but are not required
-yet as there is still a lot of noise.
+`pylint`, `isort`, and `yapf` are also used to some extend, but are not
+required yet as there is still a lot of noise.
