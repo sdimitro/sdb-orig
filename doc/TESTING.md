@@ -14,10 +14,16 @@ $ python3 -m pip install pytest
 $ python3 -m pytest
 ```
 
-* [Flake8](http://flake8.pycqa.org/en/latest/) for style checks.
+* [Black](https://black.readthedocs.io)
 ```
-$ python3 -m pip install flake8
-$ python3 -m flake8 sdb
+$ python3 -m pip install black
+$ black sdb
+```
+
+* [isort](https://github.com/timothycrosley/isort)
+```
+$ python3 -m pip install isort
+$ isort --resursive sdb
 ```
 
 `pylint` and `yapf` are also used to some extend, but are not required
