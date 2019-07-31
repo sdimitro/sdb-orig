@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module exists solely for the REPL class"""
 import readline
+
 from sdb.command import SDBCommand
 
 
@@ -19,6 +20,7 @@ class REPL:
         The following completer code came from Eli Berdensky's blog
         released under the public domain.
         """
+
         def custom_complete(text, state):
             # None is returned for the end of the completion session.
             results = [x for x in vocabulary if x.startswith(text)] + [None]
@@ -27,14 +29,15 @@ class REPL:
             # want to mimic the default readline library behavior of adding
             # a space after it.
             return results[state] + " "
+
         return custom_complete
 
-    def __init__(self, target, vocabulary, prompt='> ', closing=''):
+    def __init__(self, target, vocabulary, prompt="> ", closing=""):
         self.prompt = prompt
         self.closing = closing
         self.vocabulary = vocabulary
         self.target = target
-        readline.parse_and_bind('tab: complete')
+        readline.parse_and_bind("tab: complete")
         readline.set_completer(REPL.__make_completer(vocabulary))
 
     def run(self):
