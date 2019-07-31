@@ -5,10 +5,11 @@
 XXX
 """
 
-import drgn
 import sys
-from sdb.repl import REPL
+
+import drgn
 from sdb.command import allSDBCommands
+from sdb.repl import REPL
 
 
 def main():
@@ -22,5 +23,5 @@ def main():
     repl.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
