@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
 
+import argparse
 import datetime
 import getopt
-import argparse
-import drgn
 import inspect
 import os
+import shlex
 import subprocess
 import sys
-import shlex
 import traceback
-from typing import Iterable, Dict, List, Type, Union, Optional
-from typing import TypeVar, Callable
+from typing import Callable, Dict, Iterable, List, Optional, Type, TypeVar, Union
+
+import drgn
 
 allSDBCommands = {}
 
@@ -31,7 +31,7 @@ class SDBCommand(object):
     # subclasses would do this
     cmdName: Optional[Union[List[str], str]] = None
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         self.prog = prog
         self.islast = False
 
@@ -47,7 +47,7 @@ class SDBCommand(object):
                     for cname in cls.cmdName:
                         SDBCommand.registerSDBCommand(cname, cls)
                 except TypeError as e:
-                    print('Invalid cmdName type in {}'.format(cls))
+                    print("Invalid cmdName type in {}".format(cls))
                     raise e
 
     @staticmethod
@@ -61,40 +61,40 @@ class SDBCommand(object):
         # a pipe character "|". If there is a "!" character detected, then
         # pipe all the remaining outout into a subshell.
         lexer = shlex.shlex(argstr, posix=False, punctuation_chars="|!")
-        lexer.wordchars += '();<>&[]'
+        lexer.wordchars += "();<>&[]"
         all_tokens = list(lexer)
         pipe_stages = []
         tokens: List[str] = []
         for n, token in enumerate(all_tokens):
-            if token == '|':
-                pipe_stages.append(' '.join(tokens))
+            if token == "|":
+                pipe_stages.append(" ".join(tokens))
                 tokens = []
-            elif token == '!':
-                pipe_stages.append(' '.join(tokens))
-                if any(t == '!' for t in all_tokens[n + 1:]):
+            elif token == "!":
+                pipe_stages.append(" ".join(tokens))
+                if any(t == "!" for t in all_tokens[n + 1 :]):
                     print("Multiple ! not supported")
                     return
-                shell_cmd = ' '.join(all_tokens[n + 1:])
+                shell_cmd = " ".join(all_tokens[n + 1 :])
                 break
             else:
                 tokens.append(token)
         else:
             # We didn't find a !, so all remaining tokens are part of
             # the last pipe
-            pipe_stages.append(' '.join(tokens))
+            pipe_stages.append(" ".join(tokens))
 
         # Build the pipeline by constructing each of the commands we want to
         # use and building a list of them.
         pipeline = []
         for stage in pipe_stages:
-            (cmdname, space, args) = stage.strip().partition(' ')
+            (cmdname, space, args) = stage.strip().partition(" ")
             try:
                 if args:
                     pipeline.append(allSDBCommands[cmdname](prog, args))
                 else:
                     pipeline.append(allSDBCommands[cmdname](prog))
             except KeyError:
-                print('sdb: cannot recognize command: {}'.format(cmdname))
+                print("sdb: cannot recognize command: {}".format(cmdname))
                 return
 
         pipeline[-1].setIsLast()
@@ -105,7 +105,8 @@ class SDBCommand(object):
         # at the end.
         if shell_cmd is not None:
             shell_proc = subprocess.Popen(
-                shell_cmd, shell=True, stdin=subprocess.PIPE, encoding='utf-8')
+                shell_cmd, shell=True, stdin=subprocess.PIPE, encoding="utf-8"
+            )
             old_stdout = sys.stdout
             sys.stdout = shell_proc.stdin  # type: ignore
 
@@ -139,42 +140,48 @@ class SDBCommand(object):
     # the pipeline, providing each stage with the earlier stage's outputs as
     # input.
     @staticmethod
-    def executePipeline(prog: drgn.Program,
-                        first_input: Iterable[drgn.Object],
-                        args: List["SDBCommand"]) -> Iterable[drgn.Object]:
+    def executePipeline(
+        prog: drgn.Program, first_input: Iterable[drgn.Object], args: List["SDBCommand"]
+    ) -> Iterable[drgn.Object]:
         # if this stage wants its input in a certain type, insert a
         # "coerce" stage before it
         if args[-1].inputType is not None:
-            args.insert(-1,
-                        Coerce(prog,
-                               args[-1].inputType,
-                               auxError='for "{}" command'.format(args[-1].cmdName)))
+            args.insert(
+                -1,
+                Coerce(
+                    prog,
+                    args[-1].inputType,
+                    auxError='for "{}" command'.format(args[-1].cmdName),
+                ),
+            )
         if len(args) == 1:
             this_input = first_input
         else:
-            this_input = SDBCommand.executePipeline(
-                prog, first_input, args[:-1])
+            this_input = SDBCommand.executePipeline(prog, first_input, args[:-1])
         yield from args[-1].call(this_input)
 
     # Run a pipeline that ends in a non-pipeable command. This function is
     # very similar to executePipeline, but it doesn't yield any results.
     @staticmethod
-    def executePipelineTerm(prog: drgn.Program,
-                            first_input: Iterable[drgn.Object],
-                            args: List["SDBCommand"]) -> None:
+    def executePipelineTerm(
+        prog: drgn.Program, first_input: Iterable[drgn.Object], args: List["SDBCommand"]
+    ) -> None:
         # if the last stage wants its input in a certain type, insert a
         # "coerce" stage before it
         assert not isinstance(args[-1], PipeableCommand)
         if args[-1].inputType is not None:
-            args.insert(-1,
-                        Coerce(prog,
-                               args[-1].inputType,
-                               auxError='for "{}" command'.format(args[-1].cmdName)))
+            args.insert(
+                -1,
+                Coerce(
+                    prog,
+                    args[-1].inputType,
+                    auxError='for "{}" command'.format(args[-1].cmdName),
+                ),
+            )
         if len(args) == 1:
             this_input = first_input
         else:
-            this_input = SDBCommand.executePipeline(
-                prog, first_input, args[:-1])
+            this_input = SDBCommand.executePipeline(prog, first_input, args[:-1])
         args[-1].call(this_input)
 
     # subclass must override this, typically with a generator, i.e. it must
@@ -186,6 +193,7 @@ class SDBCommand(object):
     def setIsLast(self) -> None:
         self.islast = True
 
+
 #
 # Commands whose call function yields an iterable of some kind; usually a
 # generator, for performance reasons.
@@ -193,12 +201,13 @@ class SDBCommand(object):
 
 
 class PipeableCommand(SDBCommand):
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         rv = self.call([])
         assert (
-            rv is not None and rv.__iter__ is not None), "{}.call() does not return an iterable".format(
-            type(self).__name__)
+            rv is not None and rv.__iter__ is not None
+        ), "{}.call() does not return an iterable".format(type(self).__name__)
+
 
 #
 # A pipe command that massages its input types into the a different type. This
@@ -209,16 +218,18 @@ class PipeableCommand(SDBCommand):
 
 
 class Coerce(PipeableCommand):
-    cmdName = 'coerce'
+    cmdName = "coerce"
 
-    def __init__(self, prog: drgn.Program, args: str = "void *",
-                 auxError: str = '') -> None:
+    def __init__(
+        self, prog: drgn.Program, args: str = "void *", auxError: str = ""
+    ) -> None:
         super().__init__(prog, args)
         self.auxError = auxError
         self.type = self.prog.type(args)
         if self.type.kind is not drgn.TypeKind.POINTER:
             raise TypeError(
-                'can only coerce to pointer types, not {}'.format(self.type))
+                "can only coerce to pointer types, not {}".format(self.type)
+            )
 
     def coerce(self, obj: drgn.Object) -> drgn.Object:
         # same type is fine
@@ -226,7 +237,10 @@ class Coerce(PipeableCommand):
             return obj
 
         # "void *" can be coerced to any pointer type
-        if obj.type_.kind is drgn.TypeKind.POINTER and obj.type_.primitive is drgn.PrimitiveType.C_VOID:
+        if (
+            obj.type_.kind is drgn.TypeKind.POINTER
+            and obj.type_.primitive is drgn.PrimitiveType.C_VOID
+        ):
             return drgn.cast(self.type, obj)
 
         # integers can be coerced to any pointer typo
@@ -238,12 +252,14 @@ class Coerce(PipeableCommand):
         # if obj.address is not None and obj.address.type == self.type:
         #    return obj.address.cast(self.type)
 
-        raise TypeError("can not coerce {} to {} {}".format(
-            obj.type_, self.type, self.auxError))
+        raise TypeError(
+            "can not coerce {} to {} {}".format(obj.type_, self.type, self.auxError)
+        )
 
     def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for i in input:
             yield self.coerce(i)
+
 
 ##############################################################################
 # Ported from: crash/commands/walk.py
@@ -258,7 +274,7 @@ class Coerce(PipeableCommand):
 class Walker(PipeableCommand):
     allWalkers: Dict[str, Type["Walker"]] = {}
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
     # When a subclass is created, register it
@@ -279,18 +295,21 @@ class Walker(PipeableCommand):
             if i.type_ != t:
                 raise TypeError(
                     'command "{}" does not handle input of type {}'.format(
-                        self.cmdName, i.type_))
+                        self.cmdName, i.type_
+                    )
+                )
 
             yield from self.walk(i)
+
 
 # A convenience command that will automatically dispatch to the appropriate
 # walker based on the type of the input data.
 
 
 class Walk(PipeableCommand):
-    cmdName = 'walk'
+    cmdName = "walk"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.args = args
 
@@ -312,8 +331,7 @@ class Walk(PipeableCommand):
             print("\t%-20s %-20s" % ("WALKER", "TYPE"))
             for t, c in baked:
                 print("\t%-20s %-20s" % (c(self.prog).cmdName, t))
-            raise TypeError('no walker found for input of type {}'.format(
-                i.type_))
+            raise TypeError("no walker found for input of type {}".format(i.type_))
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # walkers.
@@ -323,16 +341,17 @@ class Walk(PipeableCommand):
             for t, c in baked:
                 print("\t%-20s %-20s" % (c(self.prog).cmdName, t))
 
+
 ##############################################################################
 # Ported from: crash/commands/zfs/list.py
 ##############################################################################
 
 
 class List(Walker):
-    cmdName = 'list'
-    inputType = 'list_t *'
+    cmdName = "list"
+    inputType = "list_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
     def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
@@ -340,8 +359,9 @@ class List(Walker):
         first_node = input.list_head.address_of_()
         node = first_node.next
         while node != first_node:
-            yield drgn.Object(self.prog, type='void *', value=int(node) - offset)
+            yield drgn.Object(self.prog, type="void *", value=int(node) - offset)
             node = node.next
+
 
 ##############################################################################
 # Ported from: crash/commands/zfs/avl.py
@@ -351,10 +371,10 @@ class List(Walker):
 class Avl(Walker):
     """ walk avl tree """
 
-    cmdName = 'avl'
-    inputType = 'avl_tree_t *'
+    cmdName = "avl"
+    inputType = "avl_tree_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
     def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
@@ -369,11 +389,12 @@ class Avl(Walker):
         lchild = node.avl_child[0]
         yield from self.helper(lchild, offset)
 
-        obj = drgn.Object(self.prog, type='void *', value=int(node) - offset)
+        obj = drgn.Object(self.prog, type="void *", value=int(node) - offset)
         yield obj
 
         rchild = node.avl_child[1]
         yield from self.helper(rchild, offset)
+
 
 ##############################################################################
 # Ported from: crash/commands/cast.py
@@ -381,15 +402,16 @@ class Avl(Walker):
 
 
 class Cast(PipeableCommand):
-    cmdName = 'cast'
+    cmdName = "cast"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.type = self.prog.type(args)
 
     def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for obj in input:
             yield drgn.cast(self.type, obj)
+
 
 ##############################################################################
 # Ported from: crash/commands/locator.py
@@ -406,9 +428,9 @@ class Cast(PipeableCommand):
 
 
 class Locator(PipeableCommand):
-    outputType: str = ''
+    outputType: str = ""
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         # We unset the inputType here so that the pipeline doesn't add a
         # coerce before us and ruin our ability to dispatch based on multiple
@@ -421,8 +443,7 @@ class Locator(PipeableCommand):
 
     # subclass may override this
     def noInput(self) -> Iterable[drgn.Object]:
-        raise TypeError('command "{}" requires and input'.format(
-            self.cmdName))
+        raise TypeError('command "{}" requires and input'.format(self.cmdName))
 
     # Dispatch to the appropriate instance function based on the type of the
     # input we receive.
@@ -435,9 +456,8 @@ class Locator(PipeableCommand):
             # try subclass-specified input types first, so that they can
             # override any other behavior
             try:
-                for (name, method) in inspect.getmembers(
-                        self, inspect.ismethod):
-                    if not hasattr(method, 'input_typename_handled'):
+                for (name, method) in inspect.getmembers(self, inspect.ismethod):
+                    if not hasattr(method, "input_typename_handled"):
                         continue
 
                     # Cache parsed type by setting an attribute on the
@@ -445,9 +465,10 @@ class Locator(PipeableCommand):
                     # the input_typename_handled attribute is set).
                     # Unfortunately we can't do this in the decorator
                     # because the gdb types have not been set up yet.
-                    if not hasattr(method, 'input_type_handled'):
+                    if not hasattr(method, "input_type_handled"):
                         method.__func__.input_type_handled = self.prog.type(
-                            method.input_typename_handled)
+                            method.input_typename_handled
+                        )
 
                     if i.type_ == method.input_type_handled:
                         yield from method(i)
@@ -472,7 +493,9 @@ class Locator(PipeableCommand):
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
-                    self.cmdName, i.type_))
+                    self.cmdName, i.type_
+                )
+            )
         if not hasInput:
             yield from self.noInput()
 
@@ -485,7 +508,7 @@ class Locator(PipeableCommand):
             yield from self.caller(input)
 
 
-T = TypeVar('T', bound=Locator)
+T = TypeVar("T", bound=Locator)
 IH = Callable[[T, drgn.Object], Iterable[drgn.Object]]
 
 
@@ -493,7 +516,9 @@ def InputHandler(typename: str) -> Callable[[IH[T]], IH[T]]:
     def decorator(func: IH[T]) -> IH[T]:
         func.input_typename_handled = typename  # type: ignore
         return func
+
     return decorator
+
 
 ##############################################################################
 # Ported from: crash/commands/pretty_printer.py
@@ -507,7 +532,7 @@ def InputHandler(typename: str) -> Callable[[IH[T]], IH[T]]:
 class PrettyPrinter(SDBCommand):
     allPrinters: Dict[str, Type["PrettyPrinter"]] = {}
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
     # When a subclass is created, register it
@@ -527,21 +552,22 @@ class PrettyPrinter(SDBCommand):
             if i.type_ != t:
                 raise TypeError(
                     'command "{}" does not handle input of type {}'.format(
-                        self.cmdName, i.type_))
+                        self.cmdName, i.type_
+                    )
+                )
 
             self.pretty_print([i])
         return []
 
 
 class PrettyPrint(SDBCommand):
-    cmdName = 'pp'
+    cmdName = "pp"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
     def call(self, input: Iterable[drgn.Object]) -> None:  # type: ignore
-        baked = [(self.prog.type(t), c)
-                 for t, c in PrettyPrinter.allPrinters.items()]
+        baked = [(self.prog.type(t), c) for t, c in PrettyPrinter.allPrinters.items()]
         hasInput = False
         for i in input:
             hasInput = True
@@ -557,7 +583,9 @@ class PrettyPrint(SDBCommand):
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
-                    self.cmdName, i.type_))
+                    self.cmdName, i.type_
+                )
+            )
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # pretty-printers.
@@ -568,29 +596,32 @@ class PrettyPrint(SDBCommand):
                 if hasattr(c, "pretty_print"):
                     print("\t%-20s %-20s" % (c().cmdName, t))
 
+
 ##############################################################################
 # Ported from: crash/commands/zfs/spa.py
 ##############################################################################
 
 
 class Spa(Locator, PrettyPrinter):
-    cmdName = 'spa'
-    inputType = 'spa_t *'
-    outputType = 'spa_t *'
+    cmdName = "spa"
+    inputType = "spa_t *"
+    outputType = "spa_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         try:
             parser = argparse.ArgumentParser(description="spa command")
-            parser.add_argument('-v', '--vdevs', action='store_true',
-                                help='vdevs flag')
-            parser.add_argument('-m', '--metaslab', action='store_true',
-                                help='metaslab flag')
-            parser.add_argument('-H', '--histogram', action='store_true',
-                                help='histogram flag')
-            parser.add_argument('-w', '--weight', action='store_true',
-                                help='weight flag')
-            parser.add_argument('poolnames', nargs='*')
+            parser.add_argument("-v", "--vdevs", action="store_true", help="vdevs flag")
+            parser.add_argument(
+                "-m", "--metaslab", action="store_true", help="metaslab flag"
+            )
+            parser.add_argument(
+                "-H", "--histogram", action="store_true", help="histogram flag"
+            )
+            parser.add_argument(
+                "-w", "--weight", action="store_true", help="weight flag"
+            )
+            parser.add_argument("poolnames", nargs="*")
             self.args = parser.parse_args(args.split())
             self.arg_string = ""
             if self.args.metaslab:
@@ -604,26 +635,27 @@ class Spa(Locator, PrettyPrinter):
 
     def pretty_print(self, spas):
         print("{:14} {}".format("ADDR", "NAME"))
-        print("%s" % ('-' * 60))
+        print("%s" % ("-" * 60))
         for spa in spas:
-            print("{:14} {}".format(
-                hex(spa), spa.spa_name.string_().decode('utf-8')))
+            print("{:14} {}".format(hex(spa), spa.spa_name.string_().decode("utf-8")))
             if self.args.vdevs:
-                vdevs = SDBCommand.executePipeline(self.prog,
-                                                   [spa], [Vdev(self.prog)])
+                vdevs = SDBCommand.executePipeline(self.prog, [spa], [Vdev(self.prog)])
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
     def noInput(self):
         input = SDBCommand.executePipeline(
-            self.prog, [
-                self.prog['spa_namespace_avl'].address_of_()], [
-                Avl(
-                    self.prog), Cast(
-                    self.prog, 'spa_t *')])
+            self.prog,
+            [self.prog["spa_namespace_avl"].address_of_()],
+            [Avl(self.prog), Cast(self.prog, "spa_t *")],
+        )
         for spa in input:
-            if self.args.poolnames and spa.spa_name.string_() not in self.args.poolnames:
+            if (
+                self.args.poolnames
+                and spa.spa_name.string_() not in self.args.poolnames
+            ):
                 continue
             yield spa
+
 
 ##############################################################################
 # Ported from: crash/commands/zfs/zfs_util.py
@@ -635,7 +667,7 @@ def enum_lookup(prog, enum_type_name, value):
     (truncating off the common prefix """
     fields = prog.type(enum_type_name).type.enumerators
     prefix = os.path.commonprefix([f[0] for f in fields])
-    return fields[value][0][prefix.rfind('_') + 1:]
+    return fields[value][0][prefix.rfind("_") + 1 :]
 
 
 def print_histogram(histogram, size, offset):
@@ -644,26 +676,26 @@ def print_histogram(histogram, size, offset):
     minidx = size - 1
 
     for i in range(0, size):
-        if (histogram[i] > max_data):
+        if histogram[i] > max_data:
             max_data = histogram[i]
-        if (histogram[i] > 0 and i > maxidx):
+        if histogram[i] > 0 and i > maxidx:
             maxidx = i
-        if (histogram[i] > 0 and i < minidx):
+        if histogram[i] > 0 and i < minidx:
             minidx = i
-    if (max_data < 40):
+    if max_data < 40:
         max_data = 40
 
     for i in range(minidx, maxidx + 1):
-        print("%3u: %6u %s" % (i + offset, histogram[i],
-                               '*' * int(histogram[i])))
+        print("%3u: %6u %s" % (i + offset, histogram[i], "*" * int(histogram[i])))
 
 
-def nicenum(num, suffix='B'):
-    for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
-        if (num < 1024):
+def nicenum(num, suffix="B"):
+    for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
+        if num < 1024:
             return "{}{}{}".format(int(num), unit, suffix)
         num /= 1024
     return "{}{}{}".format(int(num), "Y", suffix)
+
 
 ##############################################################################
 # Ported from: crash/commands/zfs/vdev.py
@@ -671,24 +703,35 @@ def nicenum(num, suffix='B'):
 
 
 class Vdev(Locator, PrettyPrinter):
-    cmdName = 'vdev'
-    inputType = 'vdev_t *'
-    outputType = 'vdev_t *'
+    cmdName = "vdev"
+    inputType = "vdev_t *"
+    outputType = "vdev_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
         # XXX add flag for "direct children (from vdev) only"?
         # XXX add flag for "top level vdevs (from spa) only"?
         try:
             parser = argparse.ArgumentParser(description="vdev command")
-            parser.add_argument('-m', '--metaslab', action='store_true',
-                                default=False, help='metaslab flag')
-            parser.add_argument('-H', '--histogram', action='store_true',
-                                default=False, help='histogram flag')
-            parser.add_argument('-w', '--weight', action='store_true',
-                                default=False, help='weight flag')
-            parser.add_argument('vdev_ids', nargs='*', type=int)
+            parser.add_argument(
+                "-m",
+                "--metaslab",
+                action="store_true",
+                default=False,
+                help="metaslab flag",
+            )
+            parser.add_argument(
+                "-H",
+                "--histogram",
+                action="store_true",
+                default=False,
+                help="histogram flag",
+            )
+            parser.add_argument(
+                "-w", "--weight", action="store_true", default=False, help="weight flag"
+            )
+            parser.add_argument("vdev_ids", nargs="*", type=int)
             self.args = parser.parse_args(args.split())
             self.arg_string = ""
             if self.args.histogram:
@@ -700,8 +743,13 @@ class Vdev(Locator, PrettyPrinter):
 
     # arg is iterable of gdb.Value of type vdev_t*
     def pretty_print(self, vdevs, indent=0):
-        print("".ljust(indent), "ADDR".ljust(18), "STATE".ljust(7),
-              "AUX".ljust(4), "DESCRIPTION")
+        print(
+            "".ljust(indent),
+            "ADDR".ljust(18),
+            "STATE".ljust(7),
+            "AUX".ljust(4),
+            "DESCRIPTION",
+        )
         print("".ljust(indent), "-" * 60)
 
         for vdev in vdevs:
@@ -712,67 +760,81 @@ class Vdev(Locator, PrettyPrinter):
                 pvd = pvd.vdev_parent
 
             if int(vdev.vdev_path) != 0:
-                print("".ljust(indent), hex(vdev).ljust(18),
-                      enum_lookup(self.prog, 'vdev_state_t',
-                                  vdev.vdev_state).ljust(7),
-                      enum_lookup(self.prog, 'vdev_aux_t',
-                                  vdev.vdev_stat.vs_aux).ljust(4),
-                      "".ljust(level),
-                      vdev.vdev_path.string_().decode('utf-8'))
+                print(
+                    "".ljust(indent),
+                    hex(vdev).ljust(18),
+                    enum_lookup(self.prog, "vdev_state_t", vdev.vdev_state).ljust(7),
+                    enum_lookup(self.prog, "vdev_aux_t", vdev.vdev_stat.vs_aux).ljust(
+                        4
+                    ),
+                    "".ljust(level),
+                    vdev.vdev_path.string_().decode("utf-8"),
+                )
 
             else:
-                print("".ljust(indent), hex(vdev).ljust(18),
-                      enum_lookup(self.prog, 'vdev_state_t',
-                                  vdev.vdev_state).ljust(7),
-                      enum_lookup(self.prog, 'vdev_aux_t',
-                                  vdev.vdev_stat.vs_aux).ljust(4),
-                      "".ljust(level),
-                      vdev.vdev_ops.vdev_op_type.string_().decode('utf-8'))
+                print(
+                    "".ljust(indent),
+                    hex(vdev).ljust(18),
+                    enum_lookup(self.prog, "vdev_state_t", vdev.vdev_state).ljust(7),
+                    enum_lookup(self.prog, "vdev_aux_t", vdev.vdev_stat.vs_aux).ljust(
+                        4
+                    ),
+                    "".ljust(level),
+                    vdev.vdev_ops.vdev_op_type.string_().decode("utf-8"),
+                )
             if self.args.metaslab:
                 metaslabs = SDBCommand.executePipeline(
-                    self.prog, [vdev], [Metaslab(self.prog)])
-                Metaslab(self.prog, self.arg_string).pretty_print(
-                    metaslabs, indent + 5)
+                    self.prog, [vdev], [Metaslab(self.prog)]
+                )
+                Metaslab(self.prog, self.arg_string).pretty_print(metaslabs, indent + 5)
 
     # arg is gdb.Value of type spa_t*
     # need to yield gdb.Value's of type vdev_t*
-    @InputHandler('spa_t*')
+    @InputHandler("spa_t*")
     def from_spa(self, spa: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.vdev_ids:
             # yield the requested top-level vdevs
             for id in self.args.vdev_ids:
                 if id >= spa.spa_root_vdev.vdev_children:
-                    raise TypeError('vdev id {} not valid; there are only {} vdevs in {}'.format(
-                        id,
-                        spa.spa_root_vdev.vdev_children,
-                        spa.spa_name.string_().decode('utf-8')))
+                    raise TypeError(
+                        "vdev id {} not valid; there are only {} vdevs in {}".format(
+                            id,
+                            spa.spa_root_vdev.vdev_children,
+                            spa.spa_name.string_().decode("utf-8"),
+                        )
+                    )
                 yield spa.spa_root_vdev.vdev_child[id]
         else:
             yield from self.from_vdev(spa.spa_root_vdev)
 
     # arg is gdb.Value of type vdev_t*
     # need to yield gdb.Value's of type vdev_t*
-    @InputHandler('vdev_t*')
+    @InputHandler("vdev_t*")
     def from_vdev(self, vdev: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.vdev_ids:
             raise TypeError(
-                'when providing a vdev, specific child vdevs can not be requested')
+                "when providing a vdev, specific child vdevs can not be requested"
+            )
         yield vdev
         for cid in range(0, int(vdev.vdev_children)):
             cvd = vdev.vdev_child[cid]
             yield from self.from_vdev(cvd)
+
 
 ##############################################################################
 # Ported from: crash/commands/zfs/zfs_init.py
 ##############################################################################
 
 
-P2PHASE: Callable[[drgn.Object, int],
-                  drgn.Object] = lambda x, align: ((x) & ((align) - 1))
-BF64_DECODE: Callable[[drgn.Object, int, int],
-                      int] = lambda x, low, len: int(P2PHASE(x >> low, 1 << len))
-BF64_GET: Callable[[drgn.Object, int, int],
-                   int] = lambda x, low, len: BF64_DECODE(x, low, len)
+P2PHASE: Callable[[drgn.Object, int], drgn.Object] = lambda x, align: (
+    (x) & ((align) - 1)
+)
+BF64_DECODE: Callable[[drgn.Object, int, int], int] = lambda x, low, len: int(
+    P2PHASE(x >> low, 1 << len)
+)
+BF64_GET: Callable[[drgn.Object, int, int], int] = lambda x, low, len: BF64_DECODE(
+    x, low, len
+)
 
 
 def WEIGHT_IS_SPACEBASED(weight):
@@ -791,7 +853,9 @@ METASLAB_WEIGHT_PRIMARY = int(1 << 63)
 METASLAB_WEIGHT_SECONDARY = int(1 << 62)
 METASLAB_WEIGHT_CLAIM = int(1 << 61)
 METASLAB_WEIGHT_TYPE = int(1 << 60)
-METASLAB_ACTIVE_MASK = METASLAB_WEIGHT_PRIMARY | METASLAB_WEIGHT_SECONDARY | METASLAB_WEIGHT_CLAIM
+METASLAB_ACTIVE_MASK = (
+    METASLAB_WEIGHT_PRIMARY | METASLAB_WEIGHT_SECONDARY | METASLAB_WEIGHT_CLAIM
+)
 
 ##############################################################################
 # Ported from: crash/commands/zfs/metaslab.py
@@ -799,30 +863,42 @@ METASLAB_ACTIVE_MASK = METASLAB_WEIGHT_PRIMARY | METASLAB_WEIGHT_SECONDARY | MET
 
 
 class Metaslab(Locator, PrettyPrinter):
-    cmdName = 'metaslab'
-    inputType = 'metaslab_t *'
-    outputType = 'metaslab_t *'
+    cmdName = "metaslab"
+    inputType = "metaslab_t *"
+    outputType = "metaslab_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
         try:
-            parser = argparse.ArgumentParser(prog='metaslab')
-            parser.add_argument('-H', '--histogram', action='store_true',
-                                default=False, help='histogram flag')
-            parser.add_argument('-w', '--weight', action='store_true',
-                                default=False, help='weight flag')
-            parser.add_argument('metaslab_ids', nargs='*', type=int)
+            parser = argparse.ArgumentParser(prog="metaslab")
+            parser.add_argument(
+                "-H",
+                "--histogram",
+                action="store_true",
+                default=False,
+                help="histogram flag",
+            )
+            parser.add_argument(
+                "-w", "--weight", action="store_true", default=False, help="weight flag"
+            )
+            parser.add_argument("metaslab_ids", nargs="*", type=int)
             self.args = parser.parse_args(args.split())
         except BaseException:
             pass
 
     def metaslab_weight_print(prog: drgn.Program, msp, print_header, indent):
         if print_header:
-            print("".ljust(indent), "ID".rjust(3), "ACTIVE".ljust(6),
-                  "ALGORITHM".rjust(9), "FRAG".rjust(4),
-                  "ALLOC".rjust(10), "MAXSZ".rjust(12),
-                  "WEIGHT".rjust(12))
+            print(
+                "".ljust(indent),
+                "ID".rjust(3),
+                "ACTIVE".ljust(6),
+                "ALGORITHM".rjust(9),
+                "FRAG".rjust(4),
+                "ALLOC".rjust(10),
+                "MAXSZ".rjust(12),
+                "WEIGHT".rjust(12),
+            )
             print("".ljust(indent), "-" * 65)
         weight = int(msp.ms_weight)
         if weight & METASLAB_WEIGHT_PRIMARY:
@@ -839,33 +915,55 @@ class Metaslab(Locator, PrettyPrinter):
         else:
             algorithm = "SEGMENT"
 
-        print("".ljust(indent), str(int(msp.ms_id)).rjust(3), w.rjust(4),
-              "L" if msp.ms_loaded else " ", algorithm.rjust(8), end='')
+        print(
+            "".ljust(indent),
+            str(int(msp.ms_id)).rjust(3),
+            w.rjust(4),
+            "L" if msp.ms_loaded else " ",
+            algorithm.rjust(8),
+            end="",
+        )
         if msp.ms_fragmentation == -1:
-            print('-'.rjust(6), end='')
+            print("-".rjust(6), end="")
         else:
-            print((str(msp.ms_fragmentation) + "%").rjust(5), end='')
-        print(str(str(int(msp.ms_allocated_space) >> 20) + "M").rjust(7),
-              ("({0:.1f}%)".format(int(msp.ms_allocated_space)
-                                   * 100 / int(msp.ms_size)).rjust(7)),
-              nicenum(msp.ms_max_size).rjust(10), end="")
+            print((str(msp.ms_fragmentation) + "%").rjust(5), end="")
+        print(
+            str(str(int(msp.ms_allocated_space) >> 20) + "M").rjust(7),
+            (
+                "({0:.1f}%)".format(
+                    int(msp.ms_allocated_space) * 100 / int(msp.ms_size)
+                ).rjust(7)
+            ),
+            nicenum(msp.ms_max_size).rjust(10),
+            end="",
+        )
 
-        if (WEIGHT_IS_SPACEBASED(weight)):
-            print("", nicenum(weight & ~(METASLAB_ACTIVE_MASK |
-                                         METASLAB_WEIGHT_TYPE)).rjust(12))
+        if WEIGHT_IS_SPACEBASED(weight):
+            print(
+                "",
+                nicenum(weight & ~(METASLAB_ACTIVE_MASK | METASLAB_WEIGHT_TYPE)).rjust(
+                    12
+                ),
+            )
         else:
             count = str(WEIGHT_GET_COUNT(weight))
             size = nicenum(1 << WEIGHT_GET_INDEX(weight))
-            print("", (count + ' x ' + size).rjust(12))
+            print("", (count + " x " + size).rjust(12))
 
     def print_metaslab(prog: drgn.Program, msp, print_header, indent):
         sm = msp.ms_sm
 
         if print_header:
-            print("".ljust(indent), "ADDR".ljust(18), "ID".rjust(4),
-                  "OFFSET".rjust(16), "FREE".rjust(8), "FRAG".rjust(5),
-                  "UCMU".rjust(8))
-            print("".ljust(indent), '-' * 65)
+            print(
+                "".ljust(indent),
+                "ADDR".ljust(18),
+                "ID".rjust(4),
+                "OFFSET".rjust(16),
+                "FREE".rjust(8),
+                "FRAG".rjust(5),
+                "UCMU".rjust(8),
+            )
+            print("".ljust(indent), "-" * 65)
 
         free = msp.ms_size
         if sm != drgn.NULL(prog, sm.type_):
@@ -876,19 +974,23 @@ class Metaslab(Locator, PrettyPrinter):
         free = free + ufrees - uallocs
 
         uchanges_free_mem = msp.ms_unflushed_frees.rt_root.avl_numnodes
-        uchanges_free_mem *= prog.type('range_seg_t').type.size
+        uchanges_free_mem *= prog.type("range_seg_t").type.size
         uchanges_alloc_mem = msp.ms_unflushed_allocs.rt_root.avl_numnodes
-        uchanges_alloc_mem *= prog.type('range_seg_t').type.size
+        uchanges_alloc_mem *= prog.type("range_seg_t").type.size
         uchanges_mem = uchanges_free_mem + uchanges_alloc_mem
 
-        print("".ljust(indent), hex(msp).ljust(16),
-              str(int(msp.ms_id)).rjust(4),
-              hex(msp.ms_start).rjust(16),
-              nicenum(free).rjust(8), end='')
+        print(
+            "".ljust(indent),
+            hex(msp).ljust(16),
+            str(int(msp.ms_id)).rjust(4),
+            hex(msp.ms_start).rjust(16),
+            nicenum(free).rjust(8),
+            end="",
+        )
         if msp.ms_fragmentation == -1:
-            print('-'.rjust(6), end='')
+            print("-".rjust(6), end="")
         else:
-            print((str(msp.ms_fragmentation) + "%").rjust(6), end='')
+            print((str(msp.ms_fragmentation) + "%").rjust(6), end="")
         print(nicenum(uchanges_mem).rjust(9))
 
     def pretty_print(self, metaslabs, indent=0):
@@ -902,39 +1004,40 @@ class Metaslab(Locator, PrettyPrinter):
                     histogram = sm.sm_phys.smp_histogram
                     print_histogram(histogram, 32, sm.sm_shift)
             if self.args.weight:
-                Metaslab.metaslab_weight_print(
-                    self.prog, msp, first_time, indent)
+                Metaslab.metaslab_weight_print(self.prog, msp, first_time, indent)
             first_time = False
 
+    # XXX - removed because of circular dependencies when importing Vdev class
+    #
+    #    def metaslab_from_spa(self, spa):
+    #        vdevs = SDBCommand.executePipeline([spa], [Vdev()])
+    #        for vd in vdevs:
+    #            yield from self.metaslab_from_vdev(vd)
 
-# XXX - removed because of circular dependencies when importing Vdev class
-#
-#    def metaslab_from_spa(self, spa):
-#        vdevs = SDBCommand.executePipeline([spa], [Vdev()])
-#        for vd in vdevs:
-#            yield from self.metaslab_from_vdev(vd)
-
-    @InputHandler('vdev_t*')
+    @InputHandler("vdev_t*")
     def from_vdev(self, vdev: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.metaslab_ids:
             # yield the requested metaslabs
             for id in self.args.metaslab_ids:
                 if id >= vdev.vdev_ms_count:
                     raise TypeError(
-                        'metaslab id {} not valid; there are only {} metaslabs in vdev id {}'.format(
-                            id, vdev.vdev_ms_count, vdev.vdev_id))
+                        "metaslab id {} not valid; there are only {} metaslabs in vdev id {}".format(
+                            id, vdev.vdev_ms_count, vdev.vdev_id
+                        )
+                    )
                 yield vdev.vdev_ms[id]
         else:
             for m in range(0, int(vdev.vdev_ms_count)):
                 msp = vdev.vdev_ms[m]
                 yield msp
 
+
 ##############################################################################
 # Ported from: crash/commands/zfs/zfs_dbgmsg.py
 ##############################################################################
 
 
-class ZfsDbgmsgArg():
+class ZfsDbgmsgArg:
     ts: bool = False
     addr: bool = False
 
@@ -946,47 +1049,42 @@ class ZfsDbgmsgArg():
 class ZfsDbgmsg(SDBCommand):
     cmdName = "zfs_dbgmsg"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.verbosity = 0
 
-        optlist, args = getopt.getopt(args.split(), 'v')
+        optlist, args = getopt.getopt(args.split(), "v")
         if len(args) != 0:
             print("Improper arguments to ::zfs_dbgmsg: {}\n".format(args))
             return
         for (opt, arg) in optlist:
-            if opt != '-v':
+            if opt != "-v":
                 print("Improper flag to ::zfs_dbgmsg: {}\n".format(opt))
                 return
-            elif arg != '':
+            elif arg != "":
                 print("Improper value to ::zfs_dbgmsg: {}\n".format(arg))
                 return
             self.verbosity += 1
 
     # node is a zfs_dbgmsg_t*
     @staticmethod
-    def print_msg(node: drgn.Object,
-                  ts: bool = False,
-                  addr: bool = False) -> None:
+    def print_msg(node: drgn.Object, ts: bool = False, addr: bool = False) -> None:
         if addr:
             print("{} ".format(hex(node)), end="")  # type: ignore
         if ts:
-            timestamp = datetime.datetime.fromtimestamp(
-                int(node.zdm_timestamp))
-            print("{}: ".format(timestamp.strftime('%Y-%m-%dT%H:%M:%S')),
-                  end="")
+            timestamp = datetime.datetime.fromtimestamp(int(node.zdm_timestamp))
+            print("{}: ".format(timestamp.strftime("%Y-%m-%dT%H:%M:%S")), end="")
 
-        print(drgn.cast('char *', node.zdm_msg).string_().decode('utf-8'))
+        print(drgn.cast("char *", node.zdm_msg).string_().decode("utf-8"))
 
     def call(self, input: Iterable[drgn.Object]) -> None:
-        proc_list = self.prog['zfs_dbgmsgs'].pl_list
+        proc_list = self.prog["zfs_dbgmsgs"].pl_list
         list_addr = proc_list.address_of_()
         for node in SDBCommand.executePipeline(
-            self.prog, [list_addr], [
-                List(
-                    self.prog), Cast(
-                self.prog, 'zfs_dbgmsg_t *')]):
+            self.prog, [list_addr], [List(self.prog), Cast(self.prog, "zfs_dbgmsg_t *")]
+        ):
             ZfsDbgmsg.print_msg(node, self.verbosity >= 1, self.verbosity >= 2)
+
 
 ##############################################################################
 # Experimental
@@ -994,15 +1092,15 @@ class ZfsDbgmsg(SDBCommand):
 
 
 class Echo(PipeableCommand):
-    cmdName = ['echo', 'cc']
+    cmdName = ["echo", "cc"]
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.args = args
 
     def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for arg in self.args.split():
-            yield drgn.Object(self.prog, 'void *', value=int(arg, 0))
+            yield drgn.Object(self.prog, "void *", value=int(arg, 0))
         for o in input:
             yield o
 
@@ -1017,15 +1115,15 @@ def is_hex(s: str) -> bool:
 
 def resolve_for_address(prog: drgn.Program, arg: str) -> drgn.Object:
     if is_hex(arg):
-        return drgn.Object(prog, 'void *', value=int(arg, 16))
+        return drgn.Object(prog, "void *", value=int(arg, 16))
     else:
         return prog[arg].address_of_()
 
 
 class Address(PipeableCommand):
-    cmdName = ['address', 'addr']
+    cmdName = ["address", "addr"]
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.args = args
 
@@ -1043,9 +1141,10 @@ class Member(PipeableCommand):
     """
     This is an example help message
     """
-    cmdName = 'member'
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    cmdName = "member"
+
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.args = args
 
@@ -1060,21 +1159,28 @@ class Member(PipeableCommand):
 
 
 class Help(SDBCommand):
+    """
+    syntax: help <command> [<command> ...]
+
+    Prints the help message of the command(s) specified.
+    """
+
     cmdName = "help"
 
-    def __init__(self, prog: drgn.Program, args: str = '') -> None:
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
         self.args = args
 
     def call(self, input: Iterable[drgn.Object]) -> None:
         if len(self.args) == 0:
-            print('syntax: help <command>')
+            print("syntax: help <command> [<command> ...]")
             return
         for cmd in self.args.split():
             if cmd in allSDBCommands:
                 print(cmd)
+                if allSDBCommands[cmd].__doc__ is None:
+                    print("\n    <undocumented>\n")
+                    return
                 print(allSDBCommands[cmd].__doc__)
             else:
                 print("command " + cmd + " doesn't exist")
-
-# TODO: Proper error-handling everywhere

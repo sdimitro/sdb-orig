@@ -1,15 +1,7 @@
----
-
-### Disclaimer
-
-This is an experimental repo created under my personal account for
-demonstration purposes. By no means the code in this repo should be
-considered complete or used in a production environment.
-
----
-
 # sdb
 The Slick/Simple Debugger
+
+[![Build Status](https://travis-ci.com/sdimitro/sdb.svg?branch=master)](https://travis-ci.com/sdimitro/sdb)
 
 ### Installation
 
