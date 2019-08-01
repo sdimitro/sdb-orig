@@ -1,14 +1,7 @@
----
-
-### Disclaimer
-
-The project is currently in alpha stage under heavy development and
-should not be considered complete or used in a production environment.
-
----
-
 # sdb
 The Slick/Simple Debugger
+
+[![Build Status](https://travis-ci.com/sdimitro/sdb.svg?branch=master)](https://travis-ci.com/sdimitro/sdb)
 
 ### Installation
 
