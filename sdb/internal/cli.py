@@ -7,6 +7,7 @@ like the entry point, command line interface, etc...
 """
 
 import argparse
+import os
 import sys
 
 import drgn
@@ -63,7 +64,7 @@ def parse_arguments() -> argparse.Namespace:
         "--no-default-symbols",
         dest="default_symbols",
         action="store_false",
-        help="don't load any debugging symbols that were not explicitly added with -d",
+        help="don't load any debugging symbols that were not explicitly added with -s",
     )
 
     parser.add_argument(
@@ -100,6 +101,27 @@ def parse_arguments() -> argparse.Namespace:
     return args
 
 
+def load_debug_info(prog: drgn.Program, dpaths: [str]) -> None:
+    """
+    Iterates over all the paths provided (`dpaths`) and attempts
+    to load any debug information it finds. If the path provided
+    is a directory, the whole directory is traversed in search
+    of debug info.
+    """
+    for path in dpaths:
+        if os.path.isfile(path):
+            prog.load_debug_info([path])
+        elif os.path.isdir(path):
+            kos = []
+            for (ppath, __, files) in os.walk(path):
+                for f in files:
+                    if f.endswith(".ko"):
+                        kos.append(os.sep.join([ppath, f]))
+            prog.load_debug_info(kos)
+        else:
+            print("sdb: " + path + " is not a regular file or directory")
+
+
 def setup_target(args: argparse.Namespace) -> drgn.Program:
     """
     Based on the validated input from the command line, setup the
@@ -115,7 +137,7 @@ def setup_target(args: argparse.Namespace) -> drgn.Program:
         # or userland binary using the non-default debug info
         # load API.
         #
-        prog.load_debug_info(args.object)
+        args.symbol_search.insert(0, args.object)
     elif args.pid:
         prog.set_pid(args.pid)
     else:
@@ -131,12 +153,16 @@ def setup_target(args: argparse.Namespace) -> drgn.Program:
             # That's fine because the user may not need those, so
             # print a warning and proceed.
             #
-            if not args.quiet:
+            # Again because of the aforementioned short-coming of drgn
+            # we quiet any errors when loading the *default debug info*
+            # if we are looking at a crash/core dump.
+            #
+            if not args.quiet and not args.object:
                 print("sdb: " + str(debug_info_err), file=sys.stderr)
 
     if args.symbol_search:
         try:
-            prog.load_debug_info(args.symbol_search)
+            load_debug_info(prog, args.symbol_search)
         except (
             drgn.FileFormatError,
             drgn.MissingDebugInfoError,

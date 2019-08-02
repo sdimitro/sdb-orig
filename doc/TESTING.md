@@ -17,7 +17,7 @@ $ python3 -m pytest
 * [Black](https://black.readthedocs.io)
 ```
 $ python3 -m pip install black
-$ black sdb
+$ python3 -m black sdb
 ```
 
 `pylint`, `isort`, and `yapf` are also used to some extend, but are not
