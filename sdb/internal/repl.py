@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""This module exists solely for the REPL class"""
 import readline
 
 from sdb.command import SDBCommand
