@@ -14,22 +14,15 @@
 # limitations under the License.
 #
 
-from sdb.command import *
-from sdb.locator import *
-from sdb.pretty_printer import *
-from sdb.walker import *
+import glob
+import importlib
+import os
 
-#
-# The SDB commands build on top of all the SDB "infrastructure" imported
-# above, so we must be sure to import all of the commands last.
-#
-import sdb.commands
+for path in glob.glob("{}/*.py".format(os.path.dirname(__file__))):
+    if path != __file__:
+        module = os.path.splitext(os.path.basename(path))[0]
+        importlib.import_module("sdb.commands.{}".format(module))
 
-#import glob
-#import importlib
-#import os
-#
-#for path in glob.glob("{}/*.py".format(os.path.dirname(__file__))):
-#    if path != __file__:
-#        module = os.path.splitext(os.path.basename(path))[0]
-#        importlib.import_module("sdb.{}".format(module))
+for path in glob.glob("{}/*/__init__.py".format(os.path.dirname(__file__))):
+    module = os.path.basename(os.path.dirname(path))
+    importlib.import_module("sdb.commands.{}".format(module))

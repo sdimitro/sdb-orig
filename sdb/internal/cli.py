@@ -11,7 +11,7 @@ import os
 import sys
 
 import drgn
-from sdb.command import allSDBCommands
+import sdb
 from sdb.internal.repl import REPL
 
 
@@ -187,7 +187,7 @@ def main() -> None:
         print("sdb: " + str(e))
         return
 
-    repl = REPL(prog, allSDBCommands)
+    repl = REPL(prog, sdb.Command.allCommands)
     repl.run()
 
 

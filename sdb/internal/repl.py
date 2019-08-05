@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import readline
-
-from sdb.command import SDBCommand
+import sdb
 
 
 class REPL:
@@ -48,7 +47,7 @@ class REPL:
                 s = input(self.prompt).strip()
                 if not s:
                     continue
-                SDBCommand.invoke(self.target, s)
+                sdb.Command.invoke(self.target, s)
             except (EOFError, KeyboardInterrupt):
                 print(self.closing)
                 break

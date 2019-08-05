@@ -1,6 +1,6 @@
 import drgn
 import pytest
-import sdb.command as sdbc
+import sdb
 
 from typing import Iterable
 
@@ -9,11 +9,11 @@ tplatform = drgn.Platform(drgn.Architecture.UNKNOWN,
 tprog = drgn.Program(tplatform)
 
 
-def get_cmd(cmd: str, args: str = '') -> sdbc.SDBCommand:
+def get_cmd(cmd: str, args: str = '') -> sdb.Command:
     if args == '':
-        return sdbc.allSDBCommands[cmd](tprog)
+        return sdb.Command.allCommands[cmd](tprog)
     else:
-        return sdbc.allSDBCommands[cmd](tprog, args)
+        return sdb.Command.allCommands[cmd](tprog, args)
 
 
 def drain_generator(generator):

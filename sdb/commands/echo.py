@@ -14,22 +14,20 @@
 # limitations under the License.
 #
 
-from sdb.command import *
-from sdb.locator import *
-from sdb.pretty_printer import *
-from sdb.walker import *
+from typing import Iterable
 
-#
-# The SDB commands build on top of all the SDB "infrastructure" imported
-# above, so we must be sure to import all of the commands last.
-#
-import sdb.commands
+import drgn
+import sdb
 
-#import glob
-#import importlib
-#import os
-#
-#for path in glob.glob("{}/*.py".format(os.path.dirname(__file__))):
-#    if path != __file__:
-#        module = os.path.splitext(os.path.basename(path))[0]
-#        importlib.import_module("sdb.{}".format(module))
+class Echo(sdb.Command):
+    cmdName = ["echo", "cc"]
+
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
+        super().__init__(prog, args)
+        self.args = args
+
+    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        for arg in self.args.split():
+            yield drgn.Object(self.prog, "void *", value=int(arg, 0))
+        for o in input:
+            yield o
