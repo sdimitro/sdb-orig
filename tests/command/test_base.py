@@ -4,7 +4,9 @@ import sdb.command as sdbc
 
 from typing import Iterable
 
-tprog = drgn.Program(drgn.Architecture.IS_LITTLE_ENDIAN)
+tplatform = drgn.Platform(drgn.Architecture.UNKNOWN,
+                          drgn.PlatformFlags.IS_LITTLE_ENDIAN)
+tprog = drgn.Program(tplatform)
 
 
 def get_cmd(cmd: str, args: str = '') -> sdbc.SDBCommand:
