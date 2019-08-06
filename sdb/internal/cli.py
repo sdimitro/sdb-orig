@@ -180,7 +180,13 @@ def setup_target(args: argparse.Namespace) -> drgn.Program:
 def main() -> None:
     """ The entry point of the sdb "executable" """
     args = parse_arguments()
-    prog = setup_target(args)
+
+    try:
+        prog = setup_target(args)
+    except PermissionError as e:
+        print("sdb: " + str(e))
+        return
+
     repl = REPL(prog, allSDBCommands)
     repl.run()
 
