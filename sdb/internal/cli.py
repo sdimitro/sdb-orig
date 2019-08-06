@@ -12,7 +12,7 @@ import sys
 
 import drgn
 from sdb.command import allSDBCommands
-from sdb.repl import REPL
+from sdb.internal.repl import REPL
 
 
 def parse_arguments() -> argparse.Namespace:

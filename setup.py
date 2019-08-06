@@ -10,7 +10,6 @@ setup(
         "sdb",
         "sdb.command",
         "sdb.internal",
-        "sdb.repl",
     ],
 
     entry_points={
