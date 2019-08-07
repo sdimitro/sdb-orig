@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+import inspect
 import shlex
 import subprocess
 import sys
@@ -42,6 +43,10 @@ class Command(object):
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         self.prog = prog
         self.islast = False
+        self.ispipeable = False
+
+        if inspect.signature(self.call).return_annotation == Iterable[drgn.Object]:
+            self.ispipeable = True
 
     # When a subclass is created, if it has a 'cmdName' property, then
     # register it with gdb
@@ -119,8 +124,11 @@ class Command(object):
             sys.stdout = shell_proc.stdin  # type: ignore
 
         try:
-            for o in Command.executePipeline(prog, [], pipeline):
-                print(o)
+            if pipeline[-1].ispipeable:
+                for o in Command.executePipeline(prog, [], pipeline):
+                    print(o)
+            else:
+                Command.executePipelineTerm(prog, [], pipeline)
 
             if shell_cmd is not None:
                 shell_proc.stdin.flush()
