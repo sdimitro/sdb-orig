@@ -46,7 +46,7 @@ class LinuxHList(sdb.Walker):
     def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
         node = input.first
         while node != 0:
-            yield drgn.Object(
-                self.prog, type="void *", value=(int(node) - self.args.offset)
-            )
+            yield drgn.Object(self.prog,
+                              type="void *",
+                              value=(int(node) - self.args.offset))
             node = node.next

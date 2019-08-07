@@ -32,16 +32,22 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
         super().__init__(prog, args)
         try:
             parser = argparse.ArgumentParser(description="spa command")
-            parser.add_argument("-v", "--vdevs", action="store_true", help="vdevs flag")
-            parser.add_argument(
-                "-m", "--metaslab", action="store_true", help="metaslab flag"
-            )
-            parser.add_argument(
-                "-H", "--histogram", action="store_true", help="histogram flag"
-            )
-            parser.add_argument(
-                "-w", "--weight", action="store_true", help="weight flag"
-            )
+            parser.add_argument("-v",
+                                "--vdevs",
+                                action="store_true",
+                                help="vdevs flag")
+            parser.add_argument("-m",
+                                "--metaslab",
+                                action="store_true",
+                                help="metaslab flag")
+            parser.add_argument("-H",
+                                "--histogram",
+                                action="store_true",
+                                help="histogram flag")
+            parser.add_argument("-w",
+                                "--weight",
+                                action="store_true",
+                                help="weight flag")
             parser.add_argument("poolnames", nargs="*")
             self.args = parser.parse_args(args.split())
             self.arg_string = ""
@@ -58,9 +64,11 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
         print("{:14} {}".format("ADDR", "NAME"))
         print("%s" % ("-" * 60))
         for spa in spas:
-            print("{:14} {}".format(hex(spa), spa.spa_name.string_().decode("utf-8")))
+            print("{:14} {}".format(hex(spa),
+                                    spa.spa_name.string_().decode("utf-8")))
             if self.args.vdevs:
-                vdevs = sdb.Command.executePipeline(self.prog, [spa], [Vdev(self.prog)])
+                vdevs = sdb.Command.executePipeline(self.prog, [spa],
+                                                    [Vdev(self.prog)])
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
     def noInput(self):
@@ -70,9 +78,7 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
             [Avl(self.prog), Cast(self.prog, "spa_t *")],
         )
         for spa in input:
-            if (
-                self.args.poolnames
-                and spa.spa_name.string_() not in self.args.poolnames
-            ):
+            if (self.args.poolnames and
+                    spa.spa_name.string_() not in self.args.poolnames):
                 continue
             yield spa

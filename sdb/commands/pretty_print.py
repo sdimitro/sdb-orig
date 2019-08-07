@@ -27,9 +27,8 @@ class PrettyPrint(sdb.Command):
         super().__init__(prog, args)
 
     def call(self, input: Iterable[drgn.Object]) -> None:  # type: ignore
-        baked = [
-            (self.prog.type(t), c) for t, c in sdb.PrettyPrinter.allPrinters.items()
-        ]
+        baked = [(self.prog.type(t), c)
+                 for t, c in sdb.PrettyPrinter.allPrinters.items()]
         hasInput = False
         for i in input:
             hasInput = True
@@ -45,9 +44,7 @@ class PrettyPrint(sdb.Command):
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
-                    self.cmdName, i.type_
-                )
-            )
+                    self.cmdName, i.type_))
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # pretty-printers.

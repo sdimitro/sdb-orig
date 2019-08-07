@@ -51,9 +51,11 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                 default=False,
                 help="histogram flag",
             )
-            parser.add_argument(
-                "-w", "--weight", action="store_true", default=False, help="weight flag"
-            )
+            parser.add_argument("-w",
+                                "--weight",
+                                action="store_true",
+                                default=False,
+                                help="weight flag")
             parser.add_argument("vdev_ids", nargs="*", type=int)
             self.args = parser.parse_args(args.split())
             self.arg_string = ""
@@ -86,10 +88,10 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                 print(
                     "".ljust(indent),
                     hex(vdev).ljust(18),
-                    enum_lookup(self.prog, "vdev_state_t", vdev.vdev_state).ljust(7),
-                    enum_lookup(self.prog, "vdev_aux_t", vdev.vdev_stat.vs_aux).ljust(
-                        4
-                    ),
+                    enum_lookup(self.prog, "vdev_state_t",
+                                vdev.vdev_state).ljust(7),
+                    enum_lookup(self.prog, "vdev_aux_t",
+                                vdev.vdev_stat.vs_aux).ljust(4),
                     "".ljust(level),
                     vdev.vdev_path.string_().decode("utf-8"),
                 )
@@ -98,18 +100,18 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                 print(
                     "".ljust(indent),
                     hex(vdev).ljust(18),
-                    enum_lookup(self.prog, "vdev_state_t", vdev.vdev_state).ljust(7),
-                    enum_lookup(self.prog, "vdev_aux_t", vdev.vdev_stat.vs_aux).ljust(
-                        4
-                    ),
+                    enum_lookup(self.prog, "vdev_state_t",
+                                vdev.vdev_state).ljust(7),
+                    enum_lookup(self.prog, "vdev_aux_t",
+                                vdev.vdev_stat.vs_aux).ljust(4),
                     "".ljust(level),
                     vdev.vdev_ops.vdev_op_type.string_().decode("utf-8"),
                 )
             if self.args.metaslab:
-                metaslabs = sdb.Command.executePipeline(
-                    self.prog, [vdev], [Metaslab(self.prog)]
-                )
-                Metaslab(self.prog, self.arg_string).pretty_print(metaslabs, indent + 5)
+                metaslabs = sdb.Command.executePipeline(self.prog, [vdev],
+                                                        [Metaslab(self.prog)])
+                Metaslab(self.prog,
+                         self.arg_string).pretty_print(metaslabs, indent + 5)
 
     # arg is gdb.Value of type spa_t*
     # need to yield gdb.Value's of type vdev_t*
@@ -120,12 +122,12 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
             for id in self.args.vdev_ids:
                 if id >= spa.spa_root_vdev.vdev_children:
                     raise TypeError(
-                        "vdev id {} not valid; there are only {} vdevs in {}".format(
+                        "vdev id {} not valid; there are only {} vdevs in {}".
+                        format(
                             id,
                             spa.spa_root_vdev.vdev_children,
                             spa.spa_name.string_().decode("utf-8"),
-                        )
-                    )
+                        ))
                 yield spa.spa_root_vdev.vdev_child[id]
         else:
             yield from self.from_vdev(spa.spa_root_vdev)

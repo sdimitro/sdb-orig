@@ -30,7 +30,9 @@ class Walk(sdb.Command):
         self.args = args
 
     def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        baked = [(self.prog.type(k), c) for k, c in sdb.Walker.allWalkers.items()]
+        baked = [
+            (self.prog.type(k), c) for k, c in sdb.Walker.allWalkers.items()
+        ]
         hasInput = False
         for i in input:
             hasInput = True
@@ -47,7 +49,8 @@ class Walk(sdb.Command):
             print("\t%-20s %-20s" % ("WALKER", "TYPE"))
             for t, c in baked:
                 print("\t%-20s %-20s" % (c(self.prog).cmdName, t))
-            raise TypeError("no walker found for input of type {}".format(i.type_))
+            raise TypeError("no walker found for input of type {}".format(
+                i.type_))
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # walkers.

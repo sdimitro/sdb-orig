@@ -57,12 +57,14 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
 
     # node is a zfs_dbgmsg_t*
     @staticmethod
-    def print_msg(node: drgn.Object, ts: bool = False, addr: bool = False) -> None:
+    def print_msg(node: drgn.Object, ts: bool = False,
+                  addr: bool = False) -> None:
         if addr:
             print("{} ".format(hex(node)), end="")  # type: ignore
         if ts:
             timestamp = datetime.datetime.fromtimestamp(int(node.zdm_timestamp))
-            print("{}: ".format(timestamp.strftime("%Y-%m-%dT%H:%M:%S")), end="")
+            print("{}: ".format(timestamp.strftime("%Y-%m-%dT%H:%M:%S")),
+                  end="")
 
         print(drgn.cast("char *", node.zdm_msg).string_().decode("utf-8"))
 
@@ -75,6 +77,7 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
         list_addr = proc_list.address_of_()
 
         for node in sdb.Command.executePipeline(
-            self.prog, [list_addr], [List(self.prog), Cast(self.prog, "zfs_dbgmsg_t *")]
-        ):
+                self.prog, [list_addr],
+            [List(self.prog),
+             Cast(self.prog, "zfs_dbgmsg_t *")]):
             yield node

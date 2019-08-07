@@ -60,7 +60,8 @@ class Locator(sdb.Command):
             # try subclass-specified input types first, so that they can
             # override any other behavior
             try:
-                for (name, method) in inspect.getmembers(self, inspect.ismethod):
+                for (name,
+                     method) in inspect.getmembers(self, inspect.ismethod):
                     if not hasattr(method, "input_typename_handled"):
                         continue
 
@@ -71,8 +72,7 @@ class Locator(sdb.Command):
                     # because the gdb types have not been set up yet.
                     if not hasattr(method, "input_type_handled"):
                         method.__func__.input_type_handled = self.prog.type(
-                            method.input_typename_handled
-                        )
+                            method.input_typename_handled)
 
                     if i.type_ == method.input_type_handled:
                         yield from method(i)
@@ -97,9 +97,7 @@ class Locator(sdb.Command):
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
-                    self.cmdName, i.type_
-                )
-            )
+                    self.cmdName, i.type_))
         if not hasInput:
             yield from self.noInput()
 
@@ -117,6 +115,7 @@ IH = Callable[[T, drgn.Object], Iterable[drgn.Object]]
 
 
 def InputHandler(typename: str) -> Callable[[IH[T]], IH[T]]:
+
     def decorator(func: IH[T]) -> IH[T]:
         func.input_typename_handled = typename  # type: ignore
         return func

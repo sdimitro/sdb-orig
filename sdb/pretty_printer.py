@@ -48,9 +48,7 @@ class PrettyPrinter(sdb.Command):
             if i.type_ != t:
                 raise TypeError(
                     'command "{}" does not handle input of type {}'.format(
-                        self.cmdName, i.type_
-                    )
-                )
+                        self.cmdName, i.type_))
 
             self.pretty_print([i])
         return []
