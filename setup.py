@@ -8,7 +8,9 @@ setup(
 
     packages=[
         "sdb",
-        "sdb.command",
+        "sdb.commands",
+        "sdb.commands.zfs",
+        "sdb.commands.zfs.internal",
         "sdb.internal",
     ],
 

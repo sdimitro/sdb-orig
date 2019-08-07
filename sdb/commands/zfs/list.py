@@ -14,13 +14,23 @@
 # limitations under the License.
 #
 
-from sdb.command import *
-from sdb.locator import *
-from sdb.pretty_printer import *
-from sdb.walker import *
+from typing import Iterable
 
-#
-# The SDB commands build on top of all the SDB "infrastructure" imported
-# above, so we must be sure to import all of the commands last.
-#
-import sdb.commands
+import drgn
+import sdb
+
+
+class List(sdb.Walker):
+    cmdName = "list"
+    inputType = "list_t *"
+
+    def __init__(self, prog: drgn.Program, args: str = "") -> None:
+        super().__init__(prog, args)
+
+    def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
+        offset = int(input.list_offset)
+        first_node = input.list_head.address_of_()
+        node = first_node.next
+        while node != first_node:
+            yield drgn.Object(self.prog, type="void *", value=int(node) - offset)
+            node = node.next
