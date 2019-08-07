@@ -33,7 +33,7 @@ class Help(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
-    def call(self, input: Iterable[drgn.Object]) -> None:
+    def call(self, input: Iterable[drgn.Object]) -> Iterable[None]:
         if len(self.args) == 0:
             print("syntax: help <command> [<command> ...]")
             return
@@ -46,3 +46,5 @@ class Help(sdb.Command):
                 print(sdb.Command.allCommands[cmd].__doc__)
             else:
                 print("command " + cmd + " doesn't exist")
+
+        yield None
