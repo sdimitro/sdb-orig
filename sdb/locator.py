@@ -30,6 +30,7 @@ import sdb
 # workflow.
 #
 
+
 class Locator(sdb.Command):
     outputType: str = ""
 

@@ -19,6 +19,7 @@ from typing import Iterable
 import drgn
 import sdb
 
+
 def is_hex(s: str) -> bool:
     try:
         int(s, 16)

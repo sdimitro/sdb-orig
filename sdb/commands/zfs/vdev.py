@@ -24,6 +24,7 @@ import sdb
 from sdb.commands.zfs.internal import *
 from sdb.commands.zfs.metaslab import Metaslab
 
+
 class Vdev(sdb.Locator, sdb.PrettyPrinter):
     cmdName = "vdev"
     inputType = "vdev_t *"

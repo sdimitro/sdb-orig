@@ -19,6 +19,7 @@ from typing import Iterable
 import drgn
 import sdb
 
+
 class Cast(sdb.Command):
     cmdName = "cast"
 

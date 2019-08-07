@@ -24,12 +24,3 @@ from sdb.walker import *
 # above, so we must be sure to import all of the commands last.
 #
 import sdb.commands
-
-#import glob
-#import importlib
-#import os
-#
-#for path in glob.glob("{}/*.py".format(os.path.dirname(__file__))):
-#    if path != __file__:
-#        module = os.path.splitext(os.path.basename(path))[0]
-#        importlib.import_module("sdb.{}".format(module))

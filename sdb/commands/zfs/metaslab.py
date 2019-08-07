@@ -23,6 +23,7 @@ import sdb
 
 from sdb.commands.zfs.internal import *
 
+
 class Metaslab(sdb.Locator, sdb.PrettyPrinter):
     cmdName = "metaslab"
     inputType = "metaslab_t *"

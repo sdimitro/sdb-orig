@@ -24,6 +24,7 @@ import sdb
 # a specific type of data, in a human readable way.
 #
 
+
 class PrettyPrinter(sdb.Command):
     allPrinters: Dict[str, Type["PrettyPrinter"]] = {}
 
