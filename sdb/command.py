@@ -45,7 +45,8 @@ class Command(object):
         self.islast = False
         self.ispipeable = False
 
-        if inspect.signature(self.call).return_annotation == Iterable[drgn.Object]:
+        if inspect.signature(
+                self.call).return_annotation == Iterable[drgn.Object]:
             self.ispipeable = True
 
     # When a subclass is created, if it has a 'cmdName' property, then
@@ -84,10 +85,10 @@ class Command(object):
                 tokens = []
             elif token == "!":
                 pipe_stages.append(" ".join(tokens))
-                if any(t == "!" for t in all_tokens[n + 1 :]):
+                if any(t == "!" for t in all_tokens[n + 1:]):
                     print("Multiple ! not supported")
                     return
-                shell_cmd = " ".join(all_tokens[n + 1 :])
+                shell_cmd = " ".join(all_tokens[n + 1:])
                 break
             else:
                 tokens.append(token)
@@ -117,9 +118,10 @@ class Command(object):
         # use everywhere. We'll fix stdout to point back to the normal stdout
         # at the end.
         if shell_cmd is not None:
-            shell_proc = subprocess.Popen(
-                shell_cmd, shell=True, stdin=subprocess.PIPE, encoding="utf-8"
-            )
+            shell_proc = subprocess.Popen(shell_cmd,
+                                          shell=True,
+                                          stdin=subprocess.PIPE,
+                                          encoding="utf-8")
             old_stdout = sys.stdout
             sys.stdout = shell_proc.stdin  # type: ignore
 
@@ -149,9 +151,8 @@ class Command(object):
     # through the pipeline, providing each stage with the earlier stage's
     # outputs as input.
     @staticmethod
-    def executePipeline(
-        prog: drgn.Program, first_input: Iterable[drgn.Object], args: List["Command"]
-    ) -> Iterable[drgn.Object]:
+    def executePipeline(prog: drgn.Program, first_input: Iterable[drgn.Object],
+                        args: List["Command"]) -> Iterable[drgn.Object]:
         if len(args) == 1:
             this_input = first_input
         else:
@@ -161,9 +162,9 @@ class Command(object):
     # Run a pipeline that ends in a non-pipeable command. This function is
     # very similar to executePipeline, but it doesn't yield any results.
     @staticmethod
-    def executePipelineTerm(
-        prog: drgn.Program, first_input: Iterable[drgn.Object], args: List["Command"]
-    ) -> None:
+    def executePipelineTerm(prog: drgn.Program,
+                            first_input: Iterable[drgn.Object],
+                            args: List["Command"]) -> None:
         if len(args) == 1:
             this_input = first_input
         else:

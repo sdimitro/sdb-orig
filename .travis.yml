@@ -5,11 +5,11 @@ python:
   - "3.6"
 
 install:
-  - python3 -m pip install black
+  - python3 -m pip install yapf
   - python3 -m pip install pytest
 
 script:
-  - black --check sdb
+  - yapf --diff --style google --recursive sdb
   - pytest tests
 
 #

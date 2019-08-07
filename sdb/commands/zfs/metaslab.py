@@ -41,9 +41,11 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
                 default=False,
                 help="histogram flag",
             )
-            parser.add_argument(
-                "-w", "--weight", action="store_true", default=False, help="weight flag"
-            )
+            parser.add_argument("-w",
+                                "--weight",
+                                action="store_true",
+                                default=False,
+                                help="weight flag")
             parser.add_argument("metaslab_ids", nargs="*", type=int)
             self.args = parser.parse_args(args.split())
         except BaseException:
@@ -91,11 +93,8 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             print((str(msp.ms_fragmentation) + "%").rjust(5), end="")
         print(
             str(str(int(msp.ms_allocated_space) >> 20) + "M").rjust(7),
-            (
-                "({0:.1f}%)".format(
-                    int(msp.ms_allocated_space) * 100 / int(msp.ms_size)
-                ).rjust(7)
-            ),
+            ("({0:.1f}%)".format(
+                int(msp.ms_allocated_space) * 100 / int(msp.ms_size)).rjust(7)),
             nicenum(msp.ms_max_size).rjust(10),
             end="",
         )
@@ -103,9 +102,9 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
         if WEIGHT_IS_SPACEBASED(weight):
             print(
                 "",
-                nicenum(weight & ~(METASLAB_ACTIVE_MASK | METASLAB_WEIGHT_TYPE)).rjust(
-                    12
-                ),
+                nicenum(weight &
+                        ~(METASLAB_ACTIVE_MASK | METASLAB_WEIGHT_TYPE)).rjust(
+                            12),
             )
         else:
             count = str(WEIGHT_GET_COUNT(weight))
@@ -166,7 +165,8 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
                     histogram = sm.sm_phys.smp_histogram
                     print_histogram(histogram, 32, sm.sm_shift)
             if self.args.weight:
-                Metaslab.metaslab_weight_print(self.prog, msp, first_time, indent)
+                Metaslab.metaslab_weight_print(self.prog, msp, first_time,
+                                               indent)
             first_time = False
 
     # XXX - removed because of circular dependencies when importing Vdev class
@@ -183,10 +183,8 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             for id in self.args.metaslab_ids:
                 if id >= vdev.vdev_ms_count:
                     raise TypeError(
-                        "metaslab id {} not valid; there are only {} metaslabs in vdev id {}".format(
-                            id, vdev.vdev_ms_count, vdev.vdev_id
-                        )
-                    )
+                        "metaslab id {} not valid; there are only {} metaslabs in vdev id {}"
+                        .format(id, vdev.vdev_ms_count, vdev.vdev_id))
                 yield vdev.vdev_ms[id]
         else:
             for m in range(0, int(vdev.vdev_ms_count)):

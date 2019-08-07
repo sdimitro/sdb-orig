@@ -26,7 +26,7 @@ def enum_lookup(prog, enum_type_name, value):
     (truncating off the common prefix) """
     fields = prog.type(enum_type_name).type.enumerators
     prefix = os.path.commonprefix([f[0] for f in fields])
-    return fields[value][0][prefix.rfind("_") + 1 :]
+    return fields[value][0][prefix.rfind("_") + 1:]
 
 
 def print_histogram(histogram, size, offset):
@@ -45,7 +45,8 @@ def print_histogram(histogram, size, offset):
         max_data = 40
 
     for i in range(minidx, maxidx + 1):
-        print("%3u: %6u %s" % (i + offset, histogram[i], "*" * int(histogram[i])))
+        print("%3u: %6u %s" %
+              (i + offset, histogram[i], "*" * int(histogram[i])))
 
 
 def nicenum(num, suffix="B"):
@@ -56,15 +57,12 @@ def nicenum(num, suffix="B"):
     return "{}{}{}".format(int(num), "Y", suffix)
 
 
-P2PHASE: Callable[[drgn.Object, int], drgn.Object] = lambda x, align: (
-    (x) & ((align) - 1)
-)
+P2PHASE: Callable[[drgn.Object, int], drgn.Object] = lambda x, align: ((x) & (
+    (align) - 1))
 BF64_DECODE: Callable[[drgn.Object, int, int], int] = lambda x, low, len: int(
-    P2PHASE(x >> low, 1 << len)
-)
-BF64_GET: Callable[[drgn.Object, int, int], int] = lambda x, low, len: BF64_DECODE(
-    x, low, len
-)
+    P2PHASE(x >> low, 1 << len))
+BF64_GET: Callable[[drgn.Object, int, int],
+                   int] = lambda x, low, len: BF64_DECODE(x, low, len)
 
 
 def WEIGHT_IS_SPACEBASED(weight):
@@ -83,6 +81,5 @@ METASLAB_WEIGHT_PRIMARY = int(1 << 63)
 METASLAB_WEIGHT_SECONDARY = int(1 << 62)
 METASLAB_WEIGHT_CLAIM = int(1 << 61)
 METASLAB_WEIGHT_TYPE = int(1 << 60)
-METASLAB_ACTIVE_MASK = (
-    METASLAB_WEIGHT_PRIMARY | METASLAB_WEIGHT_SECONDARY | METASLAB_WEIGHT_CLAIM
-)
+METASLAB_ACTIVE_MASK = (METASLAB_WEIGHT_PRIMARY | METASLAB_WEIGHT_SECONDARY |
+                        METASLAB_WEIGHT_CLAIM)
