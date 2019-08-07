@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from sdb.command import *
 from sdb.locator import *
 from sdb.pretty_printer import *

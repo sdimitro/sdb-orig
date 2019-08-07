@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import inspect
 import shlex
 import subprocess
@@ -23,14 +25,16 @@ from typing import Dict, Iterable, List, Optional, Type, Union
 
 import drgn
 
-#
-# This class is the superclass of all commands intended for use with SDB. The
-# distinguishing feature of SDB commands is that they take an input to their
-# `call` method.
-#
 
+class Command:
+    """
+    This is the superclass of all SDB command classes.
 
-class Command(object):
+    This class intends to be the superclass of all other SDB command
+    classes, and is responsible for implementing all the logic that is
+    required to integrate the command with the SDB REPL.
+    """
+
     allCommands: Dict[str, Type["Command"]] = {}
 
     inputType: Optional[str] = None
@@ -40,6 +44,7 @@ class Command(object):
     # subclasses would do this
     cmdName: Optional[Union[List[str], str]] = None
 
+    # pylint: disable=unused-argument
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         self.prog = prog
         self.islast = False
@@ -55,19 +60,22 @@ class Command(object):
         super().__init_subclass__(**kwargs)
         if cls.cmdName:
             if isinstance(cls.cmdName, str):
-                Command.registerCommand(cls.cmdName, cls)
+                Command.register_command(cls.cmdName, cls)
             else:
                 try:
                     for cname in cls.cmdName:
-                        Command.registerCommand(cname, cls)
-                except TypeError as e:
+                        Command.register_command(cname, cls)
+                except TypeError as err:
                     print("Invalid cmdName type in {}".format(cls))
-                    raise e
+                    raise err
 
     @staticmethod
-    def registerCommand(name: str, c: Type["Command"]) -> None:
-        Command.allCommands[name] = c
+    def register_command(name: str, cls: Type["Command"]) -> None:
+        Command.allCommands[name] = cls
 
+    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-statements
     @staticmethod
     def invoke(prog: drgn.Program, argstr: str) -> None:
         shell_cmd = None
@@ -79,16 +87,16 @@ class Command(object):
         all_tokens = list(lexer)
         pipe_stages = []
         tokens: List[str] = []
-        for n, token in enumerate(all_tokens):
+        for num, token in enumerate(all_tokens):
             if token == "|":
                 pipe_stages.append(" ".join(tokens))
                 tokens = []
             elif token == "!":
                 pipe_stages.append(" ".join(tokens))
-                if any(t == "!" for t in all_tokens[n + 1:]):
+                if any(t == "!" for t in all_tokens[num + 1:]):
                     print("Multiple ! not supported")
                     return
-                shell_cmd = " ".join(all_tokens[n + 1:])
+                shell_cmd = " ".join(all_tokens[num + 1:])
                 break
             else:
                 tokens.append(token)
@@ -101,7 +109,7 @@ class Command(object):
         # use and building a list of them.
         pipeline = []
         for stage in pipe_stages:
-            (cmdname, space, args) = stage.strip().partition(" ")
+            (cmdname, _, args) = stage.strip().partition(" ")
             try:
                 if args:
                     pipeline.append(Command.allCommands[cmdname](prog, args))
@@ -111,7 +119,7 @@ class Command(object):
                 print("sdb: cannot recognize command: {}".format(cmdname))
                 return
 
-        pipeline[-1].setIsLast()
+        pipeline[-1].set_islast()
 
         # If we have a !, redirect stdout to a shell process. This avoids
         # having to have a custom printing function that we pass around and
@@ -127,10 +135,10 @@ class Command(object):
 
         try:
             if pipeline[-1].ispipeable:
-                for o in Command.executePipeline(prog, [], pipeline):
-                    print(o)
+                for obj in Command.execute_pipeline(prog, [], pipeline):
+                    print(obj)
             else:
-                Command.executePipelineTerm(prog, [], pipeline)
+                Command.execute_pipeline_term(prog, [], pipeline)
 
             if shell_cmd is not None:
                 shell_proc.stdin.flush()
@@ -138,9 +146,9 @@ class Command(object):
 
         except BrokenPipeError:
             pass
-        except Exception as e:
+        except Exception as err:  # pylint: disable=broad-except
             traceback.print_exc()
-            print(e)
+            print(err)
             return
         finally:
             if shell_cmd is not None:
@@ -151,31 +159,30 @@ class Command(object):
     # through the pipeline, providing each stage with the earlier stage's
     # outputs as input.
     @staticmethod
-    def executePipeline(prog: drgn.Program, first_input: Iterable[drgn.Object],
-                        args: List["Command"]) -> Iterable[drgn.Object]:
+    def execute_pipeline(prog: drgn.Program, first_input: Iterable[drgn.Object],
+                         args: List["Command"]) -> Iterable[drgn.Object]:
         if len(args) == 1:
             this_input = first_input
         else:
-            this_input = Command.executePipeline(prog, first_input, args[:-1])
+            this_input = Command.execute_pipeline(prog, first_input, args[:-1])
+
         yield from args[-1].call(this_input)
 
     # Run a pipeline that ends in a non-pipeable command. This function is
-    # very similar to executePipeline, but it doesn't yield any results.
+    # very similar to execute_pipeline, but it doesn't yield any results.
     @staticmethod
-    def executePipelineTerm(prog: drgn.Program,
-                            first_input: Iterable[drgn.Object],
-                            args: List["Command"]) -> None:
+    def execute_pipeline_term(prog: drgn.Program,
+                              first_input: Iterable[drgn.Object],
+                              args: List["Command"]) -> None:
         if len(args) == 1:
             this_input = first_input
         else:
-            this_input = Command.executePipeline(prog, first_input, args[:-1])
+            this_input = Command.execute_pipeline(prog, first_input, args[:-1])
+
         args[-1].call(this_input)
 
-    # subclass must override this, typically with a generator, i.e. it must
-    # use `yield`
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         raise NotImplementedError
 
-    # called if this is the last thing in the pipeline
-    def setIsLast(self) -> None:
+    def set_islast(self) -> None:
         self.islast = True

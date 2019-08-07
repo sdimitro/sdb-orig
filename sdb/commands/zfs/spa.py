@@ -67,12 +67,12 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
             print("{:14} {}".format(hex(spa),
                                     spa.spa_name.string_().decode("utf-8")))
             if self.args.vdevs:
-                vdevs = sdb.Command.executePipeline(self.prog, [spa],
-                                                    [Vdev(self.prog)])
+                vdevs = sdb.Command.execute_pipeline(self.prog, [spa],
+                                                     [Vdev(self.prog)])
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
     def noInput(self):
-        input = sdb.Command.executePipeline(
+        input = sdb.Command.execute_pipeline(
             self.prog,
             [self.prog["spa_namespace_avl"].address_of_()],
             [Avl(self.prog), Cast(self.prog, "spa_t *")],
