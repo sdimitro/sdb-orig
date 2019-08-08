@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -33,8 +35,8 @@ class Help(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
-    def call(self, input: Iterable[drgn.Object]) -> None:
-        if len(self.args) == 0:
+    def call(self, objs: Iterable[drgn.Object]) -> None:
+        if not self.args:
             print("syntax: help <command> [<command> ...]")
             return
         for cmd in self.args.split():
