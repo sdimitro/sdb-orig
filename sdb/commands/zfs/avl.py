@@ -24,7 +24,7 @@ class Avl(sdb.Walker):
     """ walk avl tree """
 
     cmdName = "avl"
-    inputType = "avl_tree_t *"
+    input_type = "avl_tree_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

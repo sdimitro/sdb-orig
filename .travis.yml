@@ -6,10 +6,12 @@ python:
 
 install:
   - python3 -m pip install yapf
+  - python3 -m pip install pylint
   - python3 -m pip install pytest
 
 script:
   - yapf --diff --style google --recursive sdb
+  - pylint -d duplicate-code sdb/*.py
   - pytest tests
 
 #

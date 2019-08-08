@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Dict, Iterable, Type
 
 import drgn
@@ -26,29 +28,28 @@ import sdb
 
 
 class PrettyPrinter(sdb.Command):
-    allPrinters: Dict[str, Type["PrettyPrinter"]] = {}
+    # pylint: disable=missing-docstring
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
+    allPrinters: Dict[str, Type["PrettyPrinter"]] = {}
 
     # When a subclass is created, register it
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        assert cls.inputType is not None
-        PrettyPrinter.allPrinters[cls.inputType] = cls
+        assert cls.input_type is not None
+        PrettyPrinter.allPrinters[cls.input_type] = cls
 
-    def pretty_print(self, input: Iterable[drgn.Object]) -> None:
+    def pretty_print(self, objs: Iterable[drgn.Object]) -> None:
         raise NotImplementedError
 
     # Invoke the pretty_print function on each input, checking types as we go.
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        assert self.inputType is not None
-        t = self.prog.type(self.inputType)
-        for i in input:
-            if i.type_ != t:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        assert self.input_type is not None
+        type_ = self.prog.type(self.input_type)
+        for obj in objs:
+            if obj.type_ != type_:
                 raise TypeError(
                     'command "{}" does not handle input of type {}'.format(
-                        self.cmdName, i.type_))
+                        self.cmdName, obj.type_))
 
-            self.pretty_print([i])
+            self.pretty_print([obj])
         return []

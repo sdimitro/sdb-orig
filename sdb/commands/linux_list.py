@@ -25,7 +25,7 @@ class LinuxList(sdb.Walker):
     """ walk linux list_head """
 
     cmdName = "linux_list"
-    inputType = "struct list_head *"
+    input_type = "struct list_head *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
