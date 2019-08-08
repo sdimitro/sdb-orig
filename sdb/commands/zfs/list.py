@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -24,12 +26,9 @@ class List(sdb.Walker):
     cmdName = "list"
     input_type = "list_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-
-    def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
-        offset = int(input.list_offset)
-        first_node = input.list_head.address_of_()
+    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
+        offset = int(obj.list_offset)
+        first_node = obj.list_head.address_of_()
         node = first_node.next
         while node != first_node:
             yield drgn.Object(self.prog,
