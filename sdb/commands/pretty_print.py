@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -23,20 +25,17 @@ import sdb
 class PrettyPrint(sdb.Command):
     cmdName = ["pretty_print", "pp"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-
-    def call(self, input: Iterable[drgn.Object]) -> None:  # type: ignore
-        baked = [(self.prog.type(t), c)
-                 for t, c in sdb.PrettyPrinter.allPrinters.items()]
-        hasInput = False
-        for i in input:
-            hasInput = True
+    def call(self, objs: Iterable[drgn.Object]) -> None:  # type: ignore
+        baked = [(self.prog.type(type_), class_)
+                 for type_, class_ in sdb.PrettyPrinter.allPrinters.items()]
+        has_input = False
+        for i in objs:
+            has_input = True
 
             try:
-                for t, c in baked:
-                    if i.type_ == t and hasattr(c, "pretty_print"):
-                        c(self.prog).pretty_print([i])
+                for type_, class_ in baked:
+                    if i.type_ == type_ and hasattr(class_, "pretty_print"):
+                        class_(self.prog).pretty_print([i])
                         raise StopIteration
             except StopIteration:
                 continue
@@ -48,9 +47,9 @@ class PrettyPrint(sdb.Command):
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # pretty-printers.
-        if not hasInput and self.islast:
+        if not has_input and self.islast:
             print("The following types have pretty-printers:")
             print("\t%-20s %-20s" % ("PRINTER", "TYPE"))
-            for t, c in baked:
-                if hasattr(c, "pretty_print"):
-                    print("\t%-20s %-20s" % (c(self.prog).cmdName, t))
+            for type_, class_ in baked:
+                if hasattr(class_, "pretty_print"):
+                    print("\t%-20s %-20s" % (class_(self.prog).cmdName, type_))
