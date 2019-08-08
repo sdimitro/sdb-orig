@@ -71,8 +71,6 @@ class Locator(sdb.Command):
                     # Cache parsed type by setting an attribute on the
                     # function that this method is bound to (same place
                     # the input_typename_handled attribute is set).
-                    # Unfortunately we can't do this in the decorator
-                    # because the gdb types have not been set up yet.
                     if not hasattr(method, "input_type_handled"):
                         method.__func__.input_type_handled = self.prog.type(
                             method.input_typename_handled)

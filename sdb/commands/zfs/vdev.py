@@ -66,7 +66,6 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
         except BaseException:  # pylint: disable=broad-except
             pass
 
-    # arg is iterable of gdb.Value of type vdev_t*
     def pretty_print(self, vdevs, indent=0):
         print(
             "".ljust(indent),
@@ -113,8 +112,6 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                 Metaslab(self.prog,
                          self.arg_string).pretty_print(metaslabs, indent + 5)
 
-    # arg is gdb.Value of type spa_t*
-    # need to yield gdb.Value's of type vdev_t*
     @sdb.InputHandler("spa_t*")
     def from_spa(self, spa: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.vdev_ids:
@@ -132,8 +129,6 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
         else:
             yield from self.from_vdev(spa.spa_root_vdev)
 
-    # arg is gdb.Value of type vdev_t*
-    # need to yield gdb.Value's of type vdev_t*
     @sdb.InputHandler("vdev_t*")
     def from_vdev(self, vdev: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.vdev_ids:
