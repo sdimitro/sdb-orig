@@ -1,5 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#
+# Copyright 2019 Delphix
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 """
 This file contains all the logic of the sdb "executable"
 like the entry point, command line interface, etc...
@@ -117,9 +131,9 @@ def load_debug_info(prog: drgn.Program, dpaths: [str]) -> None:
         elif os.path.isdir(path):
             kos = []
             for (ppath, __, files) in os.walk(path):
-                for f in files:
-                    if f.endswith(".ko"):
-                        kos.append(os.sep.join([ppath, f]))
+                for i in files:
+                    if i.endswith(".ko"):
+                        kos.append(os.sep.join([ppath, i]))
             prog.load_debug_info(kos)
         else:
             print("sdb: " + path + " is not a regular file or directory")
@@ -186,8 +200,8 @@ def main() -> None:
 
     try:
         prog = setup_target(args)
-    except PermissionError as e:
-        print("sdb: " + str(e))
+    except PermissionError as err:
+        print("sdb: " + str(err))
         return
 
     repl = REPL(prog, sdb.Command.allCommands)
