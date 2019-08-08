@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -26,12 +28,9 @@ class Avl(sdb.Walker):
     cmdName = "avl"
     input_type = "avl_tree_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-
-    def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
-        offset = int(input.avl_offset)
-        root = input.avl_root
+    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
+        offset = int(obj.avl_offset)
+        root = obj.avl_root
         yield from self.helper(root, offset)
 
     def helper(self, node: drgn.Object, offset: int) -> Iterable[drgn.Object]:
