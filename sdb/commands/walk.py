@@ -25,7 +25,9 @@ import sdb
 # A convenience command that will automatically dispatch to the appropriate
 # walker based on the type of the input data.
 class Walk(sdb.Command):
-    cmdName = "walk"
+    # pylint: disable=too-few-public-methods
+
+    names = ["walk"]
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
@@ -49,7 +51,7 @@ class Walk(sdb.Command):
             print("The following types have walkers:")
             print("\t%-20s %-20s" % ("WALKER", "TYPE"))
             for type_, class_ in baked:
-                print("\t%-20s %-20s" % (class_(self.prog).cmdName, type_))
+                print("\t%-20s %-20s" % (class_(self.prog).names, type_))
             raise TypeError("no walker found for input of type {}".format(
                 i.type_))
         # If we got no input and we're the last thing in the pipeline, we're
@@ -59,4 +61,4 @@ class Walk(sdb.Command):
             print("The following types have walkers:")
             print("\t%-20s %-20s" % ("WALKER", "TYPE"))
             for type_, class_ in baked:
-                print("\t%-20s %-20s" % (class_(self.prog).cmdName, type_))
+                print("\t%-20s %-20s" % (class_(self.prog).names, type_))

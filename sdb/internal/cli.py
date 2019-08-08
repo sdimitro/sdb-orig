@@ -203,7 +203,7 @@ def main() -> None:
         print("sdb: " + str(err))
         return
 
-    repl = REPL(prog, sdb.Command.allCommands)
+    repl = REPL(prog, sdb.all_commands)
     repl.run()
 
 

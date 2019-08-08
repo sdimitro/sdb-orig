@@ -27,7 +27,7 @@ from sdb.commands.zfs.list import List
 
 
 class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
-    cmdName = "zfs_dbgmsg"
+    names = ["zfs_dbgmsg"]
     input_type = "zfs_dbgmsg_t *"
     outputType = "zfs_dbgmsg_t *"
 
@@ -70,7 +70,7 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
         list_addr = proc_list.address_of_()
 
         # pylint: disable=C0330
-        for obj in sdb.Command.execute_pipeline(
+        for obj in sdb.execute_pipeline(
                 self.prog, [list_addr],
             [List(self.prog),
              Cast(self.prog, "zfs_dbgmsg_t *")]):

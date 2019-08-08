@@ -28,7 +28,7 @@ from sdb.commands.zfs.metaslab import Metaslab
 
 
 class Vdev(sdb.Locator, sdb.PrettyPrinter):
-    cmdName = "vdev"
+    names = ["vdev"]
     input_type = "vdev_t *"
     outputType = "vdev_t *"
 
@@ -108,8 +108,8 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                     vdev.vdev_ops.vdev_op_type.string_().decode("utf-8"),
                 )
             if self.args.metaslab:
-                metaslabs = sdb.Command.execute_pipeline(
-                    self.prog, [vdev], [Metaslab(self.prog)])
+                metaslabs = sdb.execute_pipeline(self.prog, [vdev],
+                                                 [Metaslab(self.prog)])
                 Metaslab(self.prog,
                          self.arg_string).pretty_print(metaslabs, indent + 5)
 

@@ -23,7 +23,7 @@ import sdb
 
 
 class List(sdb.Walker):
-    cmdName = "list"
+    names = ["list"]
     input_type = "list_t *"
 
     def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:

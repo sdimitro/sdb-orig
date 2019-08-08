@@ -65,7 +65,7 @@ class REPL:
                 line = input(self.prompt).strip()
                 if not line:
                     continue
-                sdb.Command.invoke(self.target, line)
+                sdb.invoke(self.target, line)
             except (EOFError, KeyboardInterrupt):
                 print(self.closing)
                 break

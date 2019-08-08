@@ -28,8 +28,6 @@ import sdb
 
 
 class PrettyPrinter(sdb.Command):
-    # pylint: disable=missing-docstring
-
     allPrinters: Dict[str, Type["PrettyPrinter"]] = {}
 
     # When a subclass is created, register it
@@ -49,7 +47,7 @@ class PrettyPrinter(sdb.Command):
             if obj.type_ != type_:
                 raise TypeError(
                     'command "{}" does not handle input of type {}'.format(
-                        self.cmdName, obj.type_))
+                        self.names, obj.type_))
 
             self.pretty_print([obj])
         return []
