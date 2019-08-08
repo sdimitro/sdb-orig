@@ -19,6 +19,7 @@
 import readline
 import sdb
 
+
 # pylint: disable=too-few-public-methods
 class REPL:
     """
