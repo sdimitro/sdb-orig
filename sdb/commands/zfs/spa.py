@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import argparse
 
 import drgn
@@ -57,7 +59,7 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
                 self.arg_string += "-H "
             if self.args.weight:
                 self.arg_string += "-w "
-        except BaseException:
+        except BaseException: # pylint: disable=broad-except
             pass
 
     def pretty_print(self, spas):
@@ -72,12 +74,12 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
     def no_input(self):
-        input = sdb.Command.execute_pipeline(
+        spas = sdb.Command.execute_pipeline(
             self.prog,
             [self.prog["spa_namespace_avl"].address_of_()],
             [Avl(self.prog), Cast(self.prog, "spa_t *")],
         )
-        for spa in input:
+        for spa in spas:
             if (self.args.poolnames and
                     spa.spa_name.string_() not in self.args.poolnames):
                 continue
