@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -31,11 +33,11 @@ class Member(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         members = self.args.split()
-        for o in input:
-            retObject = o
-            if len(members) != 0:
-                for m in members:
-                    retObject = retObject.member_(m)
-            yield retObject
+        for obj in objs:
+            ret_object = obj
+            if members:
+                for i in members:
+                    ret_object = ret_object.member_(i)
+            yield ret_object
