@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+# pylint: disable=unnecessary-lambda
+
 import os
 
 from typing import Callable
@@ -65,15 +68,15 @@ BF64_GET: Callable[[drgn.Object, int, int],
                    int] = lambda x, low, len: BF64_DECODE(x, low, len)
 
 
-def WEIGHT_IS_SPACEBASED(weight):
+def WEIGHT_IS_SPACEBASED(weight):  # pylint: disable=invalid-name
     return weight == 0 or BF64_GET(weight, 60, 1)
 
 
-def WEIGHT_GET_INDEX(weight):
+def WEIGHT_GET_INDEX(weight):  # pylint: disable=invalid-name
     return BF64_GET((weight), 54, 6)
 
 
-def WEIGHT_GET_COUNT(weight):
+def WEIGHT_GET_COUNT(weight):  # pylint: disable=invalid-name
     return BF64_GET((weight), 0, 54)
 
 

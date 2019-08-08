@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import argparse
 from typing import Iterable
 
@@ -43,8 +45,8 @@ class LinuxHList(sdb.Walker):
         except SystemExit:
             pass
 
-    def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
-        node = input.first
+    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
+        node = obj.first
         while node != 0:
             yield drgn.Object(self.prog,
                               type="void *",

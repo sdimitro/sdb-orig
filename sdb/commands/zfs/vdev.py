@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import argparse
 
 from typing import Iterable
@@ -21,7 +23,7 @@ from typing import Iterable
 import drgn
 import sdb
 
-from sdb.commands.zfs.internal import *
+from sdb.commands.zfs.internal import enum_lookup
 from sdb.commands.zfs.metaslab import Metaslab
 
 
@@ -33,8 +35,6 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
 
-        # XXX add flag for "direct children (from vdev) only"?
-        # XXX add flag for "top level vdevs (from spa) only"?
         try:
             parser = argparse.ArgumentParser(description="vdev command")
             parser.add_argument(
@@ -63,7 +63,7 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                 self.arg_string += "-H "
             if self.args.weight:
                 self.arg_string += "-w "
-        except BaseException:
+        except BaseException:  # pylint: disable=broad-except
             pass
 
     # arg is iterable of gdb.Value of type vdev_t*
@@ -119,16 +119,16 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
     def from_spa(self, spa: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.vdev_ids:
             # yield the requested top-level vdevs
-            for id in self.args.vdev_ids:
-                if id >= spa.spa_root_vdev.vdev_children:
+            for i in self.args.vdev_ids:
+                if i >= spa.spa_root_vdev.vdev_children:
                     raise TypeError(
                         "vdev id {} not valid; there are only {} vdevs in {}".
                         format(
-                            id,
+                            i,
                             spa.spa_root_vdev.vdev_children,
                             spa.spa_name.string_().decode("utf-8"),
                         ))
-                yield spa.spa_root_vdev.vdev_child[id]
+                yield spa.spa_root_vdev.vdev_child[i]
         else:
             yield from self.from_vdev(spa.spa_root_vdev)
 

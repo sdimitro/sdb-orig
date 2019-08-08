@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -27,8 +29,8 @@ class Echo(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for arg in self.args.split():
             yield drgn.Object(self.prog, "void *", value=int(arg, 0))
-        for o in input:
-            yield o
+        for obj in objs:
+            yield obj

@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import datetime
 import getopt
 from typing import Iterable
@@ -22,15 +24,6 @@ import drgn
 import sdb
 from sdb.commands.cast import Cast
 from sdb.commands.zfs.list import List
-
-
-class ZfsDbgmsgArg:
-    ts: bool = False
-    addr: bool = False
-
-    def __init__(self, ts: bool = False, addr: bool = False):
-        self.ts = ts
-        self.addr = addr
 
 
 class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
@@ -43,41 +36,42 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
         self.verbosity = 0
 
         optlist, args = getopt.getopt(args.split(), "v")
-        if len(args) != 0:
+        if args:
             print("Improper arguments to ::zfs_dbgmsg: {}\n".format(args))
             return
         for (opt, arg) in optlist:
             if opt != "-v":
                 print("Improper flag to ::zfs_dbgmsg: {}\n".format(opt))
                 return
-            elif arg != "":
+            if arg != "":
                 print("Improper value to ::zfs_dbgmsg: {}\n".format(arg))
                 return
             self.verbosity += 1
 
-    # node is a zfs_dbgmsg_t*
+    # obj is a zfs_dbgmsg_t*
     @staticmethod
-    def print_msg(node: drgn.Object, ts: bool = False,
+    def print_msg(obj: drgn.Object, timestamp: bool = False,
                   addr: bool = False) -> None:
         if addr:
-            print("{} ".format(hex(node)), end="")  # type: ignore
-        if ts:
-            timestamp = datetime.datetime.fromtimestamp(int(node.zdm_timestamp))
+            print("{} ".format(hex(obj)), end="")  # type: ignore
+        if timestamp:
+            timestamp = datetime.datetime.fromtimestamp(int(obj.zdm_timestamp))
             print("{}: ".format(timestamp.strftime("%Y-%m-%dT%H:%M:%S")),
                   end="")
 
-        print(drgn.cast("char *", node.zdm_msg).string_().decode("utf-8"))
+        print(drgn.cast("char *", obj.zdm_msg).string_().decode("utf-8"))
 
-    def pretty_print(self, input: Iterable[drgn.Object]) -> None:
-        for node in input:
-            ZfsDbgmsg.print_msg(node, self.verbosity >= 1, self.verbosity >= 2)
+    def pretty_print(self, objs: Iterable[drgn.Object]) -> None:
+        for obj in objs:
+            ZfsDbgmsg.print_msg(obj, self.verbosity >= 1, self.verbosity >= 2)
 
     def no_input(self) -> Iterable[drgn.Object]:
         proc_list = self.prog["zfs_dbgmsgs"].pl_list
         list_addr = proc_list.address_of_()
 
-        for node in sdb.Command.execute_pipeline(
+        # pylint: disable=C0330
+        for obj in sdb.Command.execute_pipeline(
                 self.prog, [list_addr],
             [List(self.prog),
              Cast(self.prog, "zfs_dbgmsg_t *")]):
-            yield node
+            yield obj

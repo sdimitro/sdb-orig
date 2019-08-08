@@ -14,14 +14,18 @@
 # limitations under the License.
 #
 
-import argparse
+# pylint: disable=missing-docstring
 
+import argparse
 from typing import Iterable
 
 import drgn
 import sdb
 
-from sdb.commands.zfs.internal import *
+from sdb.commands.zfs.internal import (
+    METASLAB_ACTIVE_MASK, METASLAB_WEIGHT_CLAIM, METASLAB_WEIGHT_PRIMARY,
+    METASLAB_WEIGHT_SECONDARY, METASLAB_WEIGHT_TYPE, WEIGHT_GET_COUNT,
+    WEIGHT_GET_INDEX, WEIGHT_IS_SPACEBASED, nicenum, print_histogram)
 
 
 class Metaslab(sdb.Locator, sdb.PrettyPrinter):
@@ -48,10 +52,11 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
                                 help="weight flag")
             parser.add_argument("metaslab_ids", nargs="*", type=int)
             self.args = parser.parse_args(args.split())
-        except BaseException:
+        except BaseException:  # pylint: disable=broad-except
             pass
 
-    def metaslab_weight_print(prog: drgn.Program, msp, print_header, indent):
+    @staticmethod
+    def metaslab_weight_print(msp, print_header, indent):
         if print_header:
             print(
                 "".ljust(indent),
@@ -66,13 +71,13 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             print("".ljust(indent), "-" * 65)
         weight = int(msp.ms_weight)
         if weight & METASLAB_WEIGHT_PRIMARY:
-            w = "P"
+            weight_char = "P"
         elif weight & METASLAB_WEIGHT_SECONDARY:
-            w = "S"
+            weight_char = "S"
         elif weight & METASLAB_WEIGHT_CLAIM:
-            w = "C"
+            weight_char = "C"
         else:
-            w = "-"
+            weight_char = "-"
 
         if WEIGHT_IS_SPACEBASED(weight):
             algorithm = "SPACE"
@@ -82,7 +87,7 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
         print(
             "".ljust(indent),
             str(int(msp.ms_id)).rjust(3),
-            w.rjust(4),
+            weight_char.rjust(4),
             "L" if msp.ms_loaded else " ",
             algorithm.rjust(8),
             end="",
@@ -111,8 +116,9 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             size = nicenum(1 << WEIGHT_GET_INDEX(weight))
             print("", (count + " x " + size).rjust(12))
 
+    @staticmethod
     def print_metaslab(prog: drgn.Program, msp, print_header, indent):
-        sm = msp.ms_sm
+        spacemap = msp.ms_sm
 
         if print_header:
             print(
@@ -127,8 +133,8 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             print("".ljust(indent), "-" * 65)
 
         free = msp.ms_size
-        if sm != drgn.NULL(prog, sm.type_):
-            free -= sm.sm_phys.smp_alloc
+        if spacemap != drgn.NULL(prog, spacemap.type_):
+            free -= spacemap.sm_phys.smp_alloc
 
         ufrees = msp.ms_unflushed_frees.rt_space
         uallocs = msp.ms_unflushed_allocs.rt_space
@@ -160,33 +166,25 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             if not self.args.histogram and not self.args.weight:
                 Metaslab.print_metaslab(self.prog, msp, first_time, indent)
             if self.args.histogram:
-                sm = msp.ms_sm
-                if sm != drgn.NULL(self.prog, sm.type_):
-                    histogram = sm.sm_phys.smp_histogram
-                    print_histogram(histogram, 32, sm.sm_shift)
+                spacemap = msp.ms_sm
+                if spacemap != drgn.NULL(self.prog, spacemap.type_):
+                    histogram = spacemap.sm_phys.smp_histogram
+                    print_histogram(histogram, 32, spacemap.sm_shift)
             if self.args.weight:
-                Metaslab.metaslab_weight_print(self.prog, msp, first_time,
-                                               indent)
+                Metaslab.metaslab_weight_print(msp, first_time, indent)
             first_time = False
-
-    # XXX - removed because of circular dependencies when importing Vdev class
-    #
-    #    def metaslab_from_spa(self, spa):
-    #        vdevs = SDBCommand.executePipeline([spa], [Vdev()])
-    #        for vd in vdevs:
-    #            yield from self.metaslab_from_vdev(vd)
 
     @sdb.InputHandler("vdev_t*")
     def from_vdev(self, vdev: drgn.Object) -> Iterable[drgn.Object]:
         if self.args.metaslab_ids:
             # yield the requested metaslabs
-            for id in self.args.metaslab_ids:
-                if id >= vdev.vdev_ms_count:
+            for i in self.args.metaslab_ids:
+                if i >= vdev.vdev_ms_count:
                     raise TypeError(
                         "metaslab id {} not valid; there are only {} metaslabs in vdev id {}"
-                        .format(id, vdev.vdev_ms_count, vdev.vdev_id))
-                yield vdev.vdev_ms[id]
+                        .format(i, vdev.vdev_ms_count, vdev.vdev_id))
+                yield vdev.vdev_ms[i]
         else:
-            for m in range(0, int(vdev.vdev_ms_count)):
-                msp = vdev.vdev_ms[m]
+            for i in range(0, int(vdev.vdev_ms_count)):
+                msp = vdev.vdev_ms[i]
                 yield msp

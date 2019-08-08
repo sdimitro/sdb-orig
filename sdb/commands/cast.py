@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
@@ -27,6 +29,6 @@ class Cast(sdb.Command):
         super().__init__(prog, args)
         self.type = self.prog.type(args)
 
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        for obj in input:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        for obj in objs:
             yield drgn.cast(self.type, obj)

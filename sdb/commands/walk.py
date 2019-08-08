@@ -14,7 +14,9 @@
 # limitations under the License.
 #
 
-from typing import Dict, Iterable, Type
+# pylint: disable=missing-docstring
+
+from typing import Iterable
 
 import drgn
 import sdb
@@ -29,33 +31,32 @@ class Walk(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        baked = [
-            (self.prog.type(k), c) for k, c in sdb.Walker.allWalkers.items()
-        ]
-        hasInput = False
-        for i in input:
-            hasInput = True
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        baked = [(self.prog.type(type_), class_)
+                 for type_, class_ in sdb.Walker.allWalkers.items()]
+        has_input = False
+        for i in objs:
+            has_input = True
 
             try:
-                for t, c in baked:
-                    if i.type_ == t:
-                        yield from c(self.prog).walk(i)
+                for type_, class_ in baked:
+                    if i.type_ == type_:
+                        yield from class_(self.prog).walk(i)
                         raise StopIteration
             except StopIteration:
                 continue
 
             print("The following types have walkers:")
             print("\t%-20s %-20s" % ("WALKER", "TYPE"))
-            for t, c in baked:
-                print("\t%-20s %-20s" % (c(self.prog).cmdName, t))
+            for type_, class_ in baked:
+                print("\t%-20s %-20s" % (class_(self.prog).cmdName, type_))
             raise TypeError("no walker found for input of type {}".format(
                 i.type_))
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # walkers.
-        if not hasInput and self.islast:
+        if not has_input and self.islast:
             print("The following types have walkers:")
             print("\t%-20s %-20s" % ("WALKER", "TYPE"))
-            for t, c in baked:
-                print("\t%-20s %-20s" % (c(self.prog).cmdName, t))
+            for type_, class_ in baked:
+                print("\t%-20s %-20s" % (class_(self.prog).cmdName, type_))

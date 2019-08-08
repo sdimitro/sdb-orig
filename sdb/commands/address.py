@@ -14,15 +14,17 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Iterable
 
 import drgn
 import sdb
 
 
-def is_hex(s: str) -> bool:
+def is_hex(arg: str) -> bool:
     try:
-        int(s, 16)
+        int(arg, 16)
         return True
     except ValueError:
         return False
@@ -31,8 +33,7 @@ def is_hex(s: str) -> bool:
 def resolve_for_address(prog: drgn.Program, arg: str) -> drgn.Object:
     if is_hex(arg):
         return drgn.Object(prog, "void *", value=int(arg, 16))
-    else:
-        return prog[arg].address_of_()
+    return prog[arg].address_of_()
 
 
 class Address(sdb.Command):
@@ -42,11 +43,11 @@ class Address(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        if len(self.args) > 0:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        if self.args:
             for arg in self.args.split():
                 yield resolve_for_address(self.prog, arg)
         else:
-            for i in input:
-                assert i.address_of_() is not None
-                yield i.address_of_()
+            for obj in objs:
+                assert obj.address_of_() is not None
+                yield obj.address_of_()
