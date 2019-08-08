@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# pylint: disable=missing-docstring
+"""This module contains the "sdb.PrettyPrinter" class."""
 
 from typing import Dict, Iterable, Type
 
@@ -28,19 +27,29 @@ import sdb
 
 
 class PrettyPrinter(sdb.Command):
-    allPrinters: Dict[str, Type["PrettyPrinter"]] = {}
+    """
+    A pretty printer is a command that is designed to format and print
+    out a specific type of data, in a human readable way.
+    """
+
+    all_printers: Dict[str, Type["PrettyPrinter"]] = {}
 
     # When a subclass is created, register it
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         assert cls.input_type is not None
-        PrettyPrinter.allPrinters[cls.input_type] = cls
+        PrettyPrinter.all_printers[cls.input_type] = cls
 
     def pretty_print(self, objs: Iterable[drgn.Object]) -> None:
+        # pylint: disable=missing-docstring
         raise NotImplementedError
 
-    # Invoke the pretty_print function on each input, checking types as we go.
-    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def call(self, objs: Iterable[drgn.Object]) -> None:
+        """
+        This function will call pretty_print() on each input object,
+        verifying the types as we go.
+        """
+
         assert self.input_type is not None
         type_ = self.prog.type(self.input_type)
         for obj in objs:
@@ -50,4 +59,3 @@ class PrettyPrinter(sdb.Command):
                         self.names, obj.type_))
 
             self.pretty_print([obj])
-        return []

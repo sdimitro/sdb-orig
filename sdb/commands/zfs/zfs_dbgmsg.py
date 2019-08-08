@@ -29,7 +29,7 @@ from sdb.commands.zfs.list import List
 class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
     names = ["zfs_dbgmsg"]
     input_type = "zfs_dbgmsg_t *"
-    outputType = "zfs_dbgmsg_t *"
+    output_type = "zfs_dbgmsg_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
