@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import argparse
 from typing import Iterable
 
@@ -49,9 +51,9 @@ class LinuxList(sdb.Walker):
             #
             pass
 
-    def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
-        node = input.next
-        while node != input:
+    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
+        node = obj.next
+        while node != obj:
             yield drgn.Object(self.prog,
                               type="void *",
                               value=(int(node) - self.args.offset))
