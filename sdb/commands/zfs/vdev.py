@@ -63,7 +63,7 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
                 self.arg_string += "-H "
             if self.args.weight:
                 self.arg_string += "-w "
-        except BaseException: # pylint: disable=broad-except
+        except BaseException:  # pylint: disable=broad-except
             pass
 
     # arg is iterable of gdb.Value of type vdev_t*

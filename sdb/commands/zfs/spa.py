@@ -59,7 +59,7 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
                 self.arg_string += "-H "
             if self.args.weight:
                 self.arg_string += "-w "
-        except BaseException: # pylint: disable=broad-except
+        except BaseException:  # pylint: disable=broad-except
             pass
 
     def pretty_print(self, spas):

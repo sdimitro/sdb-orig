@@ -69,7 +69,9 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
         proc_list = self.prog["zfs_dbgmsgs"].pl_list
         list_addr = proc_list.address_of_()
 
+        # pylint: disable=C0330
         for obj in sdb.Command.execute_pipeline(
                 self.prog, [list_addr],
-                [List(self.prog), Cast(self.prog, "zfs_dbgmsg_t *")]):
+            [List(self.prog),
+             Cast(self.prog, "zfs_dbgmsg_t *")]):
             yield obj
