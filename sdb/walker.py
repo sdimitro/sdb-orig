@@ -13,22 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# pylint: disable=missing-docstring
+"""This module contains the "sdb.Walker" class."""
 
 from typing import Dict, Iterable, Type
 
 import drgn
 import sdb
 
-#
-# A Walker is a command that is designed to iterate over data structures
-# that contain arbitrary data types.
-#
-
 
 class Walker(sdb.Command):
-    # pylint: disable=missing-docstring
+    """
+    A walker is a command that is designed to iterate over data
+    structures that contain arbitrary data types.
+    """
 
     allWalkers: Dict[str, Type["Walker"]] = {}
 
@@ -39,11 +36,16 @@ class Walker(sdb.Command):
         Walker.allWalkers[cls.input_type] = cls
 
     def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
+        # pylint: disable=missing-docstring
         raise NotImplementedError
 
     # Iterate over the inputs and call the walk command on each of them,
     # verifying the types as we go.
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        """
+        This function will call walk() on each input object, verifying
+        the types as we go.
+        """
         assert self.input_type is not None
         type_ = self.prog.type(self.input_type)
         for obj in objs:

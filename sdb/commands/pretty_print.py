@@ -29,7 +29,7 @@ class PrettyPrint(sdb.Command):
 
     def call(self, objs: Iterable[drgn.Object]) -> None:  # type: ignore
         baked = [(self.prog.type(type_), class_)
-                 for type_, class_ in sdb.PrettyPrinter.allPrinters.items()]
+                 for type_, class_ in sdb.PrettyPrinter.all_printers.items()]
         has_input = False
         for i in objs:
             has_input = True

@@ -22,6 +22,7 @@ from typing import Iterable, TypeVar, Callable
 import drgn
 import sdb
 
+
 class Locator(sdb.Command):
     """
     A Locator is a command that locates objects of a given type.
