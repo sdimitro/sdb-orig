@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 from typing import Dict, Iterable, Type
 
 import drgn
@@ -26,10 +28,9 @@ import sdb
 
 
 class Walker(sdb.Command):
-    allWalkers: Dict[str, Type["Walker"]] = {}
+    # pylint: disable=missing-docstring
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
+    allWalkers: Dict[str, Type["Walker"]] = {}
 
     # When a subclass is created, register it
     def __init_subclass__(cls, **kwargs):
@@ -37,18 +38,18 @@ class Walker(sdb.Command):
         assert cls.input_type is not None
         Walker.allWalkers[cls.input_type] = cls
 
-    def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
+    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
         raise NotImplementedError
 
     # Iterate over the inputs and call the walk command on each of them,
     # verifying the types as we go.
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         assert self.input_type is not None
-        t = self.prog.type(self.input_type)
-        for i in input:
-            if i.type_ != t:
+        type_ = self.prog.type(self.input_type)
+        for obj in objs:
+            if obj.type_ != type_:
                 raise TypeError(
                     'command "{}" does not handle input of type {}'.format(
-                        self.cmdName, i.type_))
+                        self.cmdName, obj.type_))
 
-            yield from self.walk(i)
+            yield from self.walk(obj)
