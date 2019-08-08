@@ -23,11 +23,9 @@ import sdb
 
 
 class Member(sdb.Command):
-    """
-    This is an example help message
-    """
+    # pylint: disable=too-few-public-methods
 
-    cmdName = "member"
+    names = ["member"]
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

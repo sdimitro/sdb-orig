@@ -25,7 +25,7 @@ import sdb
 class Avl(sdb.Walker):
     """ walk avl tree """
 
-    cmdName = "avl"
+    names = ["avl"]
     input_type = "avl_tree_t *"
 
     def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:

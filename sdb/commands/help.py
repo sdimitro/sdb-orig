@@ -29,7 +29,9 @@ class Help(sdb.Command):
     Prints the help message of the command(s) specified.
     """
 
-    cmdName = "help"
+    # pylint: disable=too-few-public-methods
+
+    names = ["help"]
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
@@ -40,11 +42,11 @@ class Help(sdb.Command):
             print("syntax: help <command> [<command> ...]")
             return
         for cmd in self.args.split():
-            if cmd in sdb.Command.allCommands:
+            if cmd in sdb.all_commands:
                 print(cmd)
-                if sdb.Command.allCommands[cmd].__doc__ is None:
+                if sdb.all_commands[cmd].__doc__ is None:
                     print("\n    <undocumented>\n")
                     return
-                print(sdb.Command.allCommands[cmd].__doc__)
+                print(sdb.all_commands[cmd].__doc__)
             else:
                 print("command " + cmd + " doesn't exist")

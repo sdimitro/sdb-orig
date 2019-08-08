@@ -49,7 +49,7 @@ class Locator(sdb.Command):
 
     # subclass may override this
     def no_input(self) -> Iterable[drgn.Object]:
-        raise TypeError('command "{}" requires and input'.format(self.cmdName))
+        raise TypeError('command "{}" requires and input'.format(self.names))
 
     # Dispatch to the appropriate instance function based on the type of the
     # input we receive.
@@ -100,7 +100,7 @@ class Locator(sdb.Command):
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
-                    self.cmdName, i.type_))
+                    self.names, i.type_))
         if not has_input:
             yield from self.no_input()
 

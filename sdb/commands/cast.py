@@ -23,7 +23,9 @@ import sdb
 
 
 class Cast(sdb.Command):
-    cmdName = "cast"
+    # pylint: disable=too-few-public-methods
+
+    names = ["cast"]
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

@@ -11,9 +11,9 @@ tprog = drgn.Program(tplatform)
 
 def get_cmd(cmd: str, args: str = '') -> sdb.Command:
     if args == '':
-        return sdb.Command.allCommands[cmd](tprog)
+        return sdb.all_commands[cmd](tprog)
     else:
-        return sdb.Command.allCommands[cmd](tprog, args)
+        return sdb.all_commands[cmd](tprog, args)
 
 
 def drain_generator(generator):

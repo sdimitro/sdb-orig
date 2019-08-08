@@ -26,7 +26,7 @@ from sdb.commands.zfs.vdev import Vdev
 
 
 class Spa(sdb.Locator, sdb.PrettyPrinter):
-    cmdName = "spa"
+    names = ["spa"]
     input_type = "spa_t *"
     outputType = "spa_t *"
 
@@ -69,12 +69,12 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
             print("{:14} {}".format(hex(spa),
                                     spa.spa_name.string_().decode("utf-8")))
             if self.args.vdevs:
-                vdevs = sdb.Command.execute_pipeline(self.prog, [spa],
-                                                     [Vdev(self.prog)])
+                vdevs = sdb.execute_pipeline(self.prog, [spa],
+                                             [Vdev(self.prog)])
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
     def no_input(self):
-        spas = sdb.Command.execute_pipeline(
+        spas = sdb.execute_pipeline(
             self.prog,
             [self.prog["spa_namespace_avl"].address_of_()],
             [Avl(self.prog), Cast(self.prog, "spa_t *")],

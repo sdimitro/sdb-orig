@@ -23,7 +23,9 @@ import sdb
 
 
 class PrettyPrint(sdb.Command):
-    cmdName = ["pretty_print", "pp"]
+    # pylint: disable=too-few-public-methods
+
+    names = ["pretty_print", "pp"]
 
     def call(self, objs: Iterable[drgn.Object]) -> None:  # type: ignore
         baked = [(self.prog.type(type_), class_)
@@ -43,7 +45,7 @@ class PrettyPrint(sdb.Command):
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
-                    self.cmdName, i.type_))
+                    self.names, i.type_))
         # If we got no input and we're the last thing in the pipeline, we're
         # probably the first thing in the pipeline. Print out the available
         # pretty-printers.
@@ -52,4 +54,4 @@ class PrettyPrint(sdb.Command):
             print("\t%-20s %-20s" % ("PRINTER", "TYPE"))
             for type_, class_ in baked:
                 if hasattr(class_, "pretty_print"):
-                    print("\t%-20s %-20s" % (class_(self.prog).cmdName, type_))
+                    print("\t%-20s %-20s" % (class_(self.prog).names, type_))

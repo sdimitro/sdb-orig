@@ -23,7 +23,9 @@ import sdb
 
 
 class Echo(sdb.Command):
-    cmdName = ["echo", "cc"]
+    # pylint: disable=too-few-public-methods
+
+    names = ["echo", "cc"]
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

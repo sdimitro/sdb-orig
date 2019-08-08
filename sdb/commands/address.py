@@ -37,7 +37,9 @@ def resolve_for_address(prog: drgn.Program, arg: str) -> drgn.Object:
 
 
 class Address(sdb.Command):
-    cmdName = ["address", "addr"]
+    # pylint: disable=too-few-public-methods
+
+    names = ["address", "addr"]
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
