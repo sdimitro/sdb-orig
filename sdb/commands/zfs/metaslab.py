@@ -26,7 +26,7 @@ from sdb.commands.zfs.internal import *
 
 class Metaslab(sdb.Locator, sdb.PrettyPrinter):
     cmdName = "metaslab"
-    inputType = "metaslab_t *"
+    input_type = "metaslab_t *"
     outputType = "metaslab_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:

@@ -35,7 +35,7 @@ class ZfsDbgmsgArg:
 
 class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
     cmdName = "zfs_dbgmsg"
-    inputType = "zfs_dbgmsg_t *"
+    input_type = "zfs_dbgmsg_t *"
     outputType = "zfs_dbgmsg_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
@@ -72,7 +72,7 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
         for node in input:
             ZfsDbgmsg.print_msg(node, self.verbosity >= 1, self.verbosity >= 2)
 
-    def noInput(self) -> Iterable[drgn.Object]:
+    def no_input(self) -> Iterable[drgn.Object]:
         proc_list = self.prog["zfs_dbgmsgs"].pl_list
         list_addr = proc_list.address_of_()
 

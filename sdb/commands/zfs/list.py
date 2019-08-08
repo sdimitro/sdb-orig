@@ -22,7 +22,7 @@ import sdb
 
 class List(sdb.Walker):
     cmdName = "list"
-    inputType = "list_t *"
+    input_type = "list_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

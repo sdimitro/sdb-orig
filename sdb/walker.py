@@ -34,8 +34,8 @@ class Walker(sdb.Command):
     # When a subclass is created, register it
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        assert cls.inputType is not None
-        Walker.allWalkers[cls.inputType] = cls
+        assert cls.input_type is not None
+        Walker.allWalkers[cls.input_type] = cls
 
     def walk(self, input: drgn.Object) -> Iterable[drgn.Object]:
         raise NotImplementedError
@@ -43,8 +43,8 @@ class Walker(sdb.Command):
     # Iterate over the inputs and call the walk command on each of them,
     # verifying the types as we go.
     def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        assert self.inputType is not None
-        t = self.prog.type(self.inputType)
+        assert self.input_type is not None
+        t = self.prog.type(self.input_type)
         for i in input:
             if i.type_ != t:
                 raise TypeError(

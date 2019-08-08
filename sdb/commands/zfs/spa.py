@@ -25,7 +25,7 @@ from sdb.commands.zfs.vdev import Vdev
 
 class Spa(sdb.Locator, sdb.PrettyPrinter):
     cmdName = "spa"
-    inputType = "spa_t *"
+    input_type = "spa_t *"
     outputType = "spa_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
@@ -71,7 +71,7 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
                                                      [Vdev(self.prog)])
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
-    def noInput(self):
+    def no_input(self):
         input = sdb.Command.execute_pipeline(
             self.prog,
             [self.prog["spa_namespace_avl"].address_of_()],

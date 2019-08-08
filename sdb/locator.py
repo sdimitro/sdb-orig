@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+# pylint: disable=missing-docstring
+
 import inspect
 
 from typing import Iterable, TypeVar, Callable
@@ -36,32 +38,31 @@ class Locator(sdb.Command):
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
-        # We unset the inputType here so that the pipeline doesn't add a
+        # We unset the input_type here so that the pipeline doesn't add a
         # coerce before us and ruin our ability to dispatch based on multiple
-        # input types. For pure locators, and inputType wouldn't be set, but
-        # hybrid Locators and PrettyPrinters will set an inputType so that
-        # PrettyPrint can dispatch to them. By unsetting the inputType in the
+        # input types. For pure locators, and input_type wouldn't be set, but
+        # hybrid Locators and PrettyPrinters will set an input_type so that
+        # PrettyPrint can dispatch to them. By unsetting the input_type in the
         # instance, after registration is complete, PrettyPrint continues to
-        # work, and the pipeline logic doesn't see an inputType to coerce to.
-        self.inputType = None
+        # work, and the pipeline logic doesn't see an input_type to coerce to.
+        self.input_type = None
 
     # subclass may override this
-    def noInput(self) -> Iterable[drgn.Object]:
+    def no_input(self) -> Iterable[drgn.Object]:
         raise TypeError('command "{}" requires and input'.format(self.cmdName))
 
     # Dispatch to the appropriate instance function based on the type of the
     # input we receive.
-    def caller(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def caller(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         out_type = self.prog.type(self.outputType)
-        hasInput = False
-        for i in input:
-            hasInput = True
+        has_input = False
+        for i in objs:
+            has_input = True
 
             # try subclass-specified input types first, so that they can
             # override any other behavior
             try:
-                for (name,
-                     method) in inspect.getmembers(self, inspect.ismethod):
+                for (_, method) in inspect.getmembers(self, inspect.ismethod):
                     if not hasattr(method, "input_typename_handled"):
                         continue
 
@@ -86,34 +87,39 @@ class Locator(sdb.Command):
                 yield i
                 continue
 
-            # try walkers
-            try:
-                for o in Walk().call([i]):
-                    yield drgn.cast(out_type, o)
-                continue
-            except TypeError:
-                pass
+            # pylint: disable=fixme
+            # XXX: Disabled until circular dependency is fixed.
+            ## try walkers
+            #try:
+            #    for obj in Walk(self.prog).call([i]):
+            #        yield drgn.cast(out_type, obj)
+            #    continue
+            #except TypeError:
+            #    pass
 
             # error
             raise TypeError(
                 'command "{}" does not handle input of type {}'.format(
                     self.cmdName, i.type_))
-        if not hasInput:
-            yield from self.noInput()
+        if not has_input:
+            yield from self.no_input()
 
-    def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+    def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         # If this is a hybrid locator/pretty printer, this is where that is
         # leveraged.
         if self.islast and isinstance(self, sdb.PrettyPrinter):
-            self.pretty_print(self.caller(input))
+            # pylint: disable=no-member
+            self.pretty_print(self.caller(objs))
         else:
-            yield from self.caller(input)
+            yield from self.caller(objs)
 
 
+# pylint: disable=invalid-name
 T = TypeVar("T", bound=Locator)
 IH = Callable[[T, drgn.Object], Iterable[drgn.Object]]
 
 
+# pylint: disable=invalid-name
 def InputHandler(typename: str) -> Callable[[IH[T]], IH[T]]:
 
     def decorator(func: IH[T]) -> IH[T]:

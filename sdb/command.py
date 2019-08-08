@@ -37,7 +37,7 @@ class Command:
 
     allCommands: Dict[str, Type["Command"]] = {}
 
-    inputType: Optional[str] = None
+    input_type: Optional[str] = None
 
     # Subclasses should fill in this attribute if they want to be
     # registered as "real" gdb commands.  Typically all concrete

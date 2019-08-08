@@ -34,16 +34,16 @@ class PrettyPrinter(sdb.Command):
     # When a subclass is created, register it
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        assert cls.inputType is not None
-        PrettyPrinter.allPrinters[cls.inputType] = cls
+        assert cls.input_type is not None
+        PrettyPrinter.allPrinters[cls.input_type] = cls
 
     def pretty_print(self, input: Iterable[drgn.Object]) -> None:
         raise NotImplementedError
 
     # Invoke the pretty_print function on each input, checking types as we go.
     def call(self, input: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        assert self.inputType is not None
-        t = self.prog.type(self.inputType)
+        assert self.input_type is not None
+        t = self.prog.type(self.input_type)
         for i in input:
             if i.type_ != t:
                 raise TypeError(
