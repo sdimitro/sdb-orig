@@ -31,7 +31,7 @@ from sdb.commands.zfs.internal import (
 class Metaslab(sdb.Locator, sdb.PrettyPrinter):
     names = ["metaslab"]
     input_type = "metaslab_t *"
-    outputType = "metaslab_t *"
+    output_type = "metaslab_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

@@ -30,7 +30,7 @@ from sdb.commands.zfs.metaslab import Metaslab
 class Vdev(sdb.Locator, sdb.PrettyPrinter):
     names = ["vdev"]
     input_type = "vdev_t *"
-    outputType = "vdev_t *"
+    output_type = "vdev_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)

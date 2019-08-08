@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# pylint: disable=missing-docstring
+"""This module contains the "sdb.Locator" class."""
 
 import inspect
 
@@ -23,18 +22,17 @@ from typing import Iterable, TypeVar, Callable
 import drgn
 import sdb
 
-#
-# A Locator is a command that locates objects of a given type.  Subclasses
-# declare that they produce a given outputType (the type being located), and
-# they provide a method for each input type that they can search for objects
-# of this type.  Additionally, many locators are also PrettyPrinters, and can
-# pretty print the things they find. There is some logic here to support that
-# workflow.
-#
-
-
 class Locator(sdb.Command):
-    outputType: str = ""
+    """
+    A Locator is a command that locates objects of a given type.
+    Subclasses declare that they produce a given output type (the type
+    being located), and they provide a method for each input type that
+    they can search for objects of this type. Additionally, many
+    locators are also PrettyPrinters, and can pretty print the things
+    they find. There is some logic here to support that workflow.
+    """
+
+    output_type: str = ""
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
@@ -47,14 +45,17 @@ class Locator(sdb.Command):
         # work, and the pipeline logic doesn't see an input_type to coerce to.
         self.input_type = None
 
-    # subclass may override this
     def no_input(self) -> Iterable[drgn.Object]:
-        raise TypeError('command "{}" requires and input'.format(self.names))
+        # pylint: disable=missing-docstring
+        raise TypeError('command "{}" requires an input'.format(self.names))
 
-    # Dispatch to the appropriate instance function based on the type of the
-    # input we receive.
     def caller(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        out_type = self.prog.type(self.outputType)
+        """
+        This method will dispatch to the appropriate instance function
+        based on the type of the input we receive.
+        """
+
+        out_type = self.prog.type(self.output_type)
         has_input = False
         for i in objs:
             has_input = True
@@ -87,15 +88,14 @@ class Locator(sdb.Command):
                 yield i
                 continue
 
-            # pylint: disable=fixme
-            # XXX: Disabled until circular dependency is fixed.
-            ## try walkers
-            #try:
-            #    for obj in Walk(self.prog).call([i]):
-            #        yield drgn.cast(out_type, obj)
-            #    continue
-            #except TypeError:
-            #    pass
+            # try walkers
+            try:
+                from sdb.commands.walk import Walk
+                for obj in Walk(self.prog).call([i]):
+                    yield drgn.cast(out_type, obj)
+                continue
+            except TypeError:
+                pass
 
             # error
             raise TypeError(
@@ -105,6 +105,7 @@ class Locator(sdb.Command):
             yield from self.no_input()
 
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
+        # pylint: disable=missing-docstring
         # If this is a hybrid locator/pretty printer, this is where that is
         # leveraged.
         if self.islast and isinstance(self, sdb.PrettyPrinter):
@@ -119,8 +120,8 @@ T = TypeVar("T", bound=Locator)
 IH = Callable[[T, drgn.Object], Iterable[drgn.Object]]
 
 
-# pylint: disable=invalid-name
 def InputHandler(typename: str) -> Callable[[IH[T]], IH[T]]:
+    # pylint: disable=invalid-name,missing-docstring
 
     def decorator(func: IH[T]) -> IH[T]:
         func.input_typename_handled = typename  # type: ignore

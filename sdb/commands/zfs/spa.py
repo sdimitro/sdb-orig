@@ -28,7 +28,7 @@ from sdb.commands.zfs.vdev import Vdev
 class Spa(sdb.Locator, sdb.PrettyPrinter):
     names = ["spa"]
     input_type = "spa_t *"
-    outputType = "spa_t *"
+    output_type = "spa_t *"
 
     def __init__(self, prog: drgn.Program, args: str = "") -> None:
         super().__init__(prog, args)
