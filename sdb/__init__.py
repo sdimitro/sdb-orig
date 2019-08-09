@@ -35,6 +35,7 @@ def register_command(name: str, class_: Type["sdb.Command"]) -> None:
 
 # pylint: disable=wrong-import-position,cyclic-import
 from sdb.command import *
+from sdb.coerce import *
 from sdb.locator import *
 from sdb.pretty_printer import *
 from sdb.walker import *
@@ -55,6 +56,14 @@ def execute_pipeline(prog: drgn.Program, first_input: Iterable[drgn.Object],
     output as input.
     """
 
+    #
+    # If the last stage wants its input to be of a certain type, we
+    # automatically insert a "coerce" stage before it, so that the input
+    # can be safely coerced into the type that it wants.
+    #
+    if pipeline[-1].input_type is not None:
+        pipeline.insert(-1, sdb.Coerce(prog, pipeline[-1].input_type))
+
     if len(pipeline) == 1:
         this_input = first_input
     else:
@@ -72,6 +81,14 @@ def execute_pipeline_term(prog: drgn.Program,
     used (rather than execute_pipeline) when the last sdb.Command in the
     pipeline doesn't yield any results.
     """
+
+    #
+    # If the last stage wants its input to be of a certain type, we
+    # automatically insert a "coerce" stage before it, so that the input
+    # can be safely coerced into the type that it wants.
+    #
+    if pipeline[-1].input_type is not None:
+        pipeline.insert(-1, sdb.Coerce(prog, pipeline[-1].input_type))
 
     if len(pipeline) == 1:
         this_input = first_input
