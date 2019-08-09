@@ -65,7 +65,14 @@ class REPL:
                 line = input(self.prompt).strip()
                 if not line:
                     continue
-                sdb.invoke(self.target, line)
+
+                objs = sdb.invoke(self.target, [], line)
+                if not objs:
+                    continue
+
+                for obj in objs:
+                    print(obj)
+
             except (EOFError, KeyboardInterrupt):
                 print(self.closing)
                 break

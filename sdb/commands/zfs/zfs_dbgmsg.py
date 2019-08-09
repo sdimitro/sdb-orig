@@ -22,8 +22,6 @@ from typing import Iterable
 
 import drgn
 import sdb
-from sdb.commands.cast import Cast
-from sdb.commands.zfs.list import List
 
 
 class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
@@ -66,12 +64,6 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
             ZfsDbgmsg.print_msg(obj, self.verbosity >= 1, self.verbosity >= 2)
 
     def no_input(self) -> Iterable[drgn.Object]:
-        proc_list = self.prog["zfs_dbgmsgs"].pl_list
-        list_addr = proc_list.address_of_()
-
-        # pylint: disable=C0330
-        for obj in sdb.execute_pipeline(
-                self.prog, [list_addr],
-            [List(self.prog),
-             Cast(self.prog, "zfs_dbgmsg_t *")]):
+        for obj in sdb.invoke(self.prog, [self.prog["zfs_dbgmsgs"].pl_list],
+                              'list | cast zfs_dbgmsg_t *'):
             yield obj

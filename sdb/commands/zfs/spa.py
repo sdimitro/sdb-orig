@@ -20,8 +20,6 @@ import argparse
 
 import drgn
 import sdb
-from sdb.commands.cast import Cast
-from sdb.commands.zfs.avl import Avl
 from sdb.commands.zfs.vdev import Vdev
 
 
@@ -74,11 +72,8 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
                 Vdev(self.prog, self.arg_string).pretty_print(vdevs, 5)
 
     def no_input(self):
-        spas = sdb.execute_pipeline(
-            self.prog,
-            [self.prog["spa_namespace_avl"].address_of_()],
-            [Avl(self.prog), Cast(self.prog, "spa_t *")],
-        )
+        spas = sdb.invoke(self.prog, [self.prog["spa_namespace_avl"]],
+                          'avl | cast spa_t *')
         for spa in spas:
             if (self.args.poolnames and
                     spa.spa_name.string_() not in self.args.poolnames):
