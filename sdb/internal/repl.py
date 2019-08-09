@@ -66,7 +66,7 @@ class REPL:
                 if not line:
                     continue
 
-                objs = sdb.invoke(self.target, line)
+                objs = sdb.invoke(self.target, [], line)
                 if not objs:
                     continue
 

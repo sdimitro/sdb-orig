@@ -98,7 +98,8 @@ def execute_pipeline_term(prog: drgn.Program,
     pipeline[-1].call(this_input)
 
 
-def invoke(prog: drgn.Program, line: str) -> Optional[Iterable[drgn.Object]]:
+def invoke(prog: drgn.Program, first_input: Iterable[drgn.Object],
+           line: str) -> Optional[Iterable[drgn.Object]]:
     """
     This function intends to integrate directly with the SDB REPL, such
     that the REPL will pass in the user-specified line, and this
@@ -172,9 +173,9 @@ def invoke(prog: drgn.Program, line: str) -> Optional[Iterable[drgn.Object]]:
 
     try:
         if pipeline[-1].ispipeable:
-            yield from execute_pipeline(prog, [], pipeline)
+            yield from execute_pipeline(prog, first_input, pipeline)
         else:
-            execute_pipeline_term(prog, [], pipeline)
+            execute_pipeline_term(prog, first_input, pipeline)
 
         if shell_cmd is not None:
             shell_proc.stdin.flush()

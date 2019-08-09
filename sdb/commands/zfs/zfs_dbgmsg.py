@@ -64,8 +64,6 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
             ZfsDbgmsg.print_msg(obj, self.verbosity >= 1, self.verbosity >= 2)
 
     def no_input(self) -> Iterable[drgn.Object]:
-        for obj in sdb.invoke(
-                self.prog,
-                'addr zfs_dbgmsgs | member pl_list | addr | list | cast zfs_dbgmsg_t *'
-        ):
+        for obj in sdb.invoke(self.prog, [self.prog["zfs_dbgmsgs"].pl_list],
+                              'list | cast zfs_dbgmsg_t *'):
             yield obj
