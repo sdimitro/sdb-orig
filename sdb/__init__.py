@@ -149,12 +149,16 @@ def invoke(prog: drgn.Program, first_input: Iterable[drgn.Object],
     for stage in pipe_stages:
         (name, _, args) = stage.strip().partition(" ")
         try:
-            if args:
-                pipeline.append(all_commands[name](prog, args))
-            else:
-                pipeline.append(all_commands[name](prog))
+            pipeline.append(all_commands[name](prog, args, name))
         except KeyError:
             print("sdb: cannot recognize command: {}".format(name))
+            return
+        except SystemExit:
+            # The passed in arguments to each command will be parsed in
+            # the command object's constructor. We use "argparse" to do
+            # the argument parsing, and when that detects an error, it
+            # will throw this exception. Rather than exiting the entire
+            # SDB session, we only abort this specific pipeline.
             return
 
     pipeline[-1].islast = True

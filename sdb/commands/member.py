@@ -16,6 +16,7 @@
 
 # pylint: disable=missing-docstring
 
+import argparse
 from typing import Iterable
 
 import drgn
@@ -31,11 +32,11 @@ class Member(sdb.Command):
         super().__init__(prog, args)
         self.args = args
 
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("members", nargs="+", metavar="<member>")
+
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        members = self.args.split()
         for obj in objs:
-            ret_object = obj
-            if members:
-                for i in members:
-                    ret_object = ret_object.member_(i)
-            yield ret_object
+            for member in self.args.members:
+                obj = obj.member_(member)
+            yield obj

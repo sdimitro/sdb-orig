@@ -114,8 +114,8 @@ def test9():
     assert ret[0].value_() == 0
     assert ret[0].type_ == tprog.type('void *')
     assert ret[1].value_() == 1
-    assert ret[1].type_ == tprog.type('void *')
+    assert ret[1].type_ == tprog.type('int')
     assert ret[2].value_() == 0
     assert ret[2].type_ == tprog.type('void *')
     assert ret[3].value_() == 1
-    assert ret[3].type_ == tprog.type('int')
+    assert ret[3].type_ == tprog.type('void *')

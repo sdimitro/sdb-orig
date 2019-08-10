@@ -21,7 +21,6 @@ from typing import Iterable
 
 import drgn
 import sdb
-
 from sdb.commands.zfs.internal import (
     METASLAB_ACTIVE_MASK, METASLAB_WEIGHT_CLAIM, METASLAB_WEIGHT_PRIMARY,
     METASLAB_WEIGHT_SECONDARY, METASLAB_WEIGHT_TYPE, WEIGHT_GET_COUNT,
@@ -33,27 +32,22 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
     input_type = "metaslab_t *"
     output_type = "metaslab_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument(
+            "-H",
+            "--histogram",
+            action="store_true",
+            default=False,
+            help="histogram flag",
+        )
 
-        try:
-            parser = argparse.ArgumentParser(prog="metaslab")
-            parser.add_argument(
-                "-H",
-                "--histogram",
-                action="store_true",
-                default=False,
-                help="histogram flag",
-            )
-            parser.add_argument("-w",
-                                "--weight",
-                                action="store_true",
-                                default=False,
-                                help="weight flag")
-            parser.add_argument("metaslab_ids", nargs="*", type=int)
-            self.args = parser.parse_args(args.split())
-        except BaseException:  # pylint: disable=broad-except
-            pass
+        parser.add_argument("-w",
+                            "--weight",
+                            action="store_true",
+                            default=False,
+                            help="weight flag")
+
+        parser.add_argument("metaslab_ids", nargs="*", type=int)
 
     @staticmethod
     def metaslab_weight_print(msp, print_header, indent):

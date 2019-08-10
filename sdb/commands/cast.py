@@ -16,6 +16,7 @@
 
 # pylint: disable=missing-docstring
 
+import argparse
 from typing import Iterable
 
 import drgn
@@ -27,9 +28,24 @@ class Cast(sdb.Command):
 
     names = ["cast"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.type = self.prog.type(args)
+    def __init__(self, prog: drgn.Program, args: str = "",
+                 name: str = "_") -> None:
+        super().__init__(prog, args, name)
+        if not self.args.type:
+            self.parser.error("the following arguments are required: type")
+
+        self.type = self.prog.type(" ".join(self.args.type))
+
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        #
+        # We use REMAINDER here to allow the type to be specified
+        # without the user having to worry about escaping whitespace.
+        # The drawback of this is an error will not be automatically
+        # thrown if no type is provided. To workaround this, we check
+        # the parsed arguments, and explicitly throw an error if needed.
+        #
+        parser.add_argument("type", nargs=argparse.REMAINDER)
+        self.parser = parser
 
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for obj in objs:

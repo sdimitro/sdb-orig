@@ -29,27 +29,12 @@ class LinuxList(sdb.Walker):
     names = ["linux_list"]
     input_type = "struct list_head *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        parser = argparse.ArgumentParser(description="walk a linux list")
-        parser.add_argument(
-            "offset",
-            default=0,
-            type=int,
-            nargs="?",
-            help="offset of list_head in structure",
-        )
-
-        try:
-            self.args = parser.parse_args(args.split())
-        except SystemExit:
-            #
-            # When the "-h" option is passed, argparse will throw this
-            # exception after the help message is printed. This would
-            # result in the SDB session exiting, which is not what we
-            # want to occur. Thus, we ignore this exception.
-            #
-            pass
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("offset",
+                            default=0,
+                            type=int,
+                            nargs="?",
+                            help="offset of list_head in structure")
 
     def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
         node = obj.next

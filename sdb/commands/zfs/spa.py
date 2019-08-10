@@ -30,37 +30,35 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
     input_type = "spa_t *"
     output_type = "spa_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        try:
-            parser = argparse.ArgumentParser(description="spa command")
-            parser.add_argument("-v",
-                                "--vdevs",
-                                action="store_true",
-                                help="vdevs flag")
-            parser.add_argument("-m",
-                                "--metaslab",
-                                action="store_true",
-                                help="metaslab flag")
-            parser.add_argument("-H",
-                                "--histogram",
-                                action="store_true",
-                                help="histogram flag")
-            parser.add_argument("-w",
-                                "--weight",
-                                action="store_true",
-                                help="weight flag")
-            parser.add_argument("poolnames", nargs="*")
-            self.args = parser.parse_args(args.split())
-            self.arg_string = ""
-            if self.args.metaslab:
-                self.arg_string += "-m "
-            if self.args.histogram:
-                self.arg_string += "-H "
-            if self.args.weight:
-                self.arg_string += "-w "
-        except BaseException:  # pylint: disable=broad-except
-            pass
+    def __init__(self, prog: drgn.Program, args: str = "",
+                 name: str = "_") -> None:
+        super().__init__(prog, args, name)
+        self.arg_string = ""
+        if self.args.metaslab:
+            self.arg_string += "-m "
+        if self.args.histogram:
+            self.arg_string += "-H "
+        if self.args.weight:
+            self.arg_string += "-w "
+
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("-v",
+                            "--vdevs",
+                            action="store_true",
+                            help="vdevs flag")
+        parser.add_argument("-m",
+                            "--metaslab",
+                            action="store_true",
+                            help="metaslab flag")
+        parser.add_argument("-H",
+                            "--histogram",
+                            action="store_true",
+                            help="histogram flag")
+        parser.add_argument("-w",
+                            "--weight",
+                            action="store_true",
+                            help="weight flag")
+        parser.add_argument("poolnames", nargs="*")
 
     def pretty_print(self, spas):
         print("{:14} {}".format("ADDR", "NAME"))

@@ -16,6 +16,7 @@
 
 # pylint: disable=missing-docstring
 
+import argparse
 from typing import Iterable
 
 import drgn
@@ -33,20 +34,16 @@ class Help(sdb.Command):
 
     names = ["help"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.args = args
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("commands", nargs="+", metavar="<command>")
 
     def call(self, objs: Iterable[drgn.Object]) -> None:
-        if not self.args:
-            print("syntax: help <command> [<command> ...]")
-            return
-        for cmd in self.args.split():
-            if cmd in sdb.all_commands:
-                print(cmd)
-                if sdb.all_commands[cmd].__doc__ is None:
+        for command in self.args.commands:
+            if command in sdb.all_commands:
+                print(command)
+                if sdb.all_commands[command].__doc__ is None:
                     print("\n    <undocumented>\n")
                     return
-                print(sdb.all_commands[cmd].__doc__)
+                print(sdb.all_commands[command].__doc__)
             else:
-                print("command " + cmd + " doesn't exist")
+                print("command " + command + " doesn't exist")

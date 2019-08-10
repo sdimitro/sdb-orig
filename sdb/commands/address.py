@@ -16,6 +16,7 @@
 
 # pylint: disable=missing-docstring
 
+import argparse
 from typing import Iterable
 
 import drgn
@@ -41,15 +42,13 @@ class Address(sdb.Command):
 
     names = ["address", "addr"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.args = args
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("symbols", nargs="*", metavar="<symbol>")
 
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        if self.args:
-            for arg in self.args.split():
-                yield resolve_for_address(self.prog, arg)
-        else:
-            for obj in objs:
-                assert obj.address_of_() is not None
-                yield obj.address_of_()
+        for obj in objs:
+            assert obj.address_of_() is not None
+            yield obj.address_of_()
+
+        for symbol in self.args.symbols:
+            yield resolve_for_address(self.prog, symbol)

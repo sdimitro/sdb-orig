@@ -16,8 +16,7 @@
 """This module contains the "sdb.Locator" class."""
 
 import inspect
-
-from typing import Iterable, TypeVar, Callable
+from typing import Callable, Iterable, TypeVar
 
 import drgn
 import sdb
@@ -35,8 +34,9 @@ class Locator(sdb.Command):
 
     output_type: str = ""
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
+    def __init__(self, prog: drgn.Program, args: str = "",
+                 name: str = "_") -> None:
+        super().__init__(prog, args, name)
         # We unset the input_type here so that the pipeline doesn't add a
         # coerce before us and ruin our ability to dispatch based on multiple
         # input types. For pure locators, and input_type wouldn't be set, but
