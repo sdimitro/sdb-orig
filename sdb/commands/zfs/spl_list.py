@@ -22,8 +22,8 @@ import drgn
 import sdb
 
 
-class List(sdb.Walker):
-    names = ["list"]
+class SPLList(sdb.Walker):
+    names = ["spl_list"]
     input_type = "list_t *"
 
     def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
