@@ -15,6 +15,7 @@
 #
 """This module contains the "sdb.Command" class."""
 
+import argparse
 import inspect
 from typing import Iterable, List, Optional
 
@@ -36,15 +37,20 @@ class Command:
     names: List[str] = []
     input_type: Optional[str] = None
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
+    def __init__(self, prog: drgn.Program, args: str = "",
+                 name: str = "_") -> None:
         self.prog = prog
-        self.args = args
+        self.name = name
         self.islast = False
         self.ispipeable = False
 
         if inspect.signature(
                 self.call).return_annotation == Iterable[drgn.Object]:
             self.ispipeable = True
+
+        parser = argparse.ArgumentParser(prog=name)
+        self._init_argparse(parser)
+        self.args = parser.parse_args(args.split())
 
     def __init_subclass__(cls, **kwargs):
         """
@@ -55,6 +61,9 @@ class Command:
         super().__init_subclass__(**kwargs)
         for name in cls.names:
             sdb.register_command(name, cls)
+
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        pass
 
     def call(self,
              objs: Iterable[drgn.Object]) -> Optional[Iterable[drgn.Object]]:

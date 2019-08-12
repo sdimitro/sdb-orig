@@ -16,8 +16,8 @@
 
 # pylint: disable=missing-docstring
 
+import argparse
 import datetime
-import getopt
 from typing import Iterable
 
 import drgn
@@ -31,22 +31,8 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
     input_type = "zfs_dbgmsg_t *"
     output_type = "zfs_dbgmsg_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.verbosity = 0
-
-        optlist, args = getopt.getopt(args.split(), "v")
-        if args:
-            print("Improper arguments to ::zfs_dbgmsg: {}\n".format(args))
-            return
-        for (opt, arg) in optlist:
-            if opt != "-v":
-                print("Improper flag to ::zfs_dbgmsg: {}\n".format(opt))
-                return
-            if arg != "":
-                print("Improper value to ::zfs_dbgmsg: {}\n".format(arg))
-                return
-            self.verbosity += 1
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument('--verbose', '-v', action='count', default=0)
 
     # obj is a zfs_dbgmsg_t*
     @staticmethod
@@ -63,7 +49,8 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
 
     def pretty_print(self, objs: Iterable[drgn.Object]) -> None:
         for obj in objs:
-            ZfsDbgmsg.print_msg(obj, self.verbosity >= 1, self.verbosity >= 2)
+            ZfsDbgmsg.print_msg(obj, self.args.verbose >= 1,
+                                self.args.verbose >= 2)
 
     def no_input(self) -> Iterable[drgn.Object]:
         proc_list = self.prog["zfs_dbgmsgs"].pl_list

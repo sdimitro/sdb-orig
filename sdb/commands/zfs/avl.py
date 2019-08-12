@@ -28,20 +28,20 @@ class Avl(sdb.Walker):
     names = ["avl"]
     input_type = "avl_tree_t *"
 
-    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
-        offset = int(obj.avl_offset)
-        root = obj.avl_root
-        yield from self.helper(root, offset)
-
-    def helper(self, node: drgn.Object, offset: int) -> Iterable[drgn.Object]:
+    def _helper(self, node: drgn.Object, offset: int) -> Iterable[drgn.Object]:
         if node == drgn.NULL(self.prog, node.type_):
             return
 
         lchild = node.avl_child[0]
-        yield from self.helper(lchild, offset)
+        yield from self._helper(lchild, offset)
 
         obj = drgn.Object(self.prog, type="void *", value=int(node) - offset)
         yield obj
 
         rchild = node.avl_child[1]
-        yield from self.helper(rchild, offset)
+        yield from self._helper(rchild, offset)
+
+    def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
+        offset = int(obj.avl_offset)
+        root = obj.avl_root
+        yield from self._helper(root, offset)

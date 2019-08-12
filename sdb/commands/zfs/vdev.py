@@ -17,12 +17,10 @@
 # pylint: disable=missing-docstring
 
 import argparse
-
 from typing import Iterable
 
 import drgn
 import sdb
-
 from sdb.commands.zfs.internal import enum_lookup
 from sdb.commands.zfs.metaslab import Metaslab
 
@@ -32,39 +30,39 @@ class Vdev(sdb.Locator, sdb.PrettyPrinter):
     input_type = "vdev_t *"
     output_type = "vdev_t *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
+    def __init__(self, prog: drgn.Program, args: str = "",
+                 name: str = "_") -> None:
+        super().__init__(prog, args, name)
+        self.arg_string = ""
+        if self.args.histogram:
+            self.arg_string += "-H "
+        if self.args.weight:
+            self.arg_string += "-w "
 
-        try:
-            parser = argparse.ArgumentParser(description="vdev command")
-            parser.add_argument(
-                "-m",
-                "--metaslab",
-                action="store_true",
-                default=False,
-                help="metaslab flag",
-            )
-            parser.add_argument(
-                "-H",
-                "--histogram",
-                action="store_true",
-                default=False,
-                help="histogram flag",
-            )
-            parser.add_argument("-w",
-                                "--weight",
-                                action="store_true",
-                                default=False,
-                                help="weight flag")
-            parser.add_argument("vdev_ids", nargs="*", type=int)
-            self.args = parser.parse_args(args.split())
-            self.arg_string = ""
-            if self.args.histogram:
-                self.arg_string += "-H "
-            if self.args.weight:
-                self.arg_string += "-w "
-        except BaseException:  # pylint: disable=broad-except
-            pass
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument(
+            "-m",
+            "--metaslab",
+            action="store_true",
+            default=False,
+            help="metaslab flag",
+        )
+
+        parser.add_argument(
+            "-H",
+            "--histogram",
+            action="store_true",
+            default=False,
+            help="histogram flag",
+        )
+
+        parser.add_argument("-w",
+                            "--weight",
+                            action="store_true",
+                            default=False,
+                            help="weight flag")
+
+        parser.add_argument("vdev_ids", nargs="*", type=int)
 
     def pretty_print(self, vdevs, indent=0):
         print(

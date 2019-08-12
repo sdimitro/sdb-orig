@@ -16,6 +16,7 @@
 
 # pylint: disable=missing-docstring
 
+import argparse
 from typing import Iterable
 
 import drgn
@@ -27,12 +28,12 @@ class Echo(sdb.Command):
 
     names = ["echo", "cc"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.args = args
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("addrs", nargs="*", metavar="<address>")
 
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
-        for arg in self.args.split():
-            yield drgn.Object(self.prog, "void *", value=int(arg, 0))
         for obj in objs:
             yield obj
+
+        for addr in self.args.addrs:
+            yield drgn.Object(self.prog, "void *", value=int(addr, 0))

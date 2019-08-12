@@ -29,21 +29,12 @@ class LinuxHList(sdb.Walker):
     names = ["linux_hlist"]
     input_type = "struct hlist_head *"
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        parser = argparse.ArgumentParser(description="walk a linux hlist")
-        parser.add_argument(
-            "offset",
-            default=0,
-            type=int,
-            nargs="?",
-            help="offset of list_head in structure",
-        )
-
-        try:
-            self.args = parser.parse_args(args.split())
-        except SystemExit:
-            pass
+    def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("offset",
+                            default=0,
+                            type=int,
+                            nargs="?",
+                            help="offset of list_head in structure")
 
     def walk(self, obj: drgn.Object) -> Iterable[drgn.Object]:
         node = obj.first

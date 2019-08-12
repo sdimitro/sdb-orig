@@ -29,10 +29,6 @@ class Walk(sdb.Command):
 
     names = ["walk"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.args = args
-
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         baked = [(self.prog.type(type_), class_)
                  for type_, class_ in sdb.Walker.allWalkers.items()]

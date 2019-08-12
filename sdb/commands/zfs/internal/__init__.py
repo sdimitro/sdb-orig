@@ -18,7 +18,6 @@
 # pylint: disable=unnecessary-lambda
 
 import os
-
 from typing import Callable
 
 import drgn
