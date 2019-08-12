@@ -23,7 +23,7 @@ from typing import Iterable
 import drgn
 import sdb
 from sdb.commands.cast import Cast
-from sdb.commands.zfs.list import List
+from sdb.commands.zfs.spl_list import SPLList
 
 
 class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
@@ -59,6 +59,6 @@ class ZfsDbgmsg(sdb.Locator, sdb.PrettyPrinter):
         # pylint: disable=C0330
         for obj in sdb.execute_pipeline(
                 self.prog, [list_addr],
-            [List(self.prog),
+            [SPLList(self.prog),
              Cast(self.prog, "zfs_dbgmsg_t *")]):
             yield obj
