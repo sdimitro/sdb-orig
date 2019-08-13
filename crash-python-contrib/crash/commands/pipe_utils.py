@@ -27,47 +27,6 @@ class LineCount(PipeableCommand):
             i += 1
         yield gdb.Value(i)
 
-import re
-def parseMember(value : gdb.Value, memberString : str, strictChecking : bool = False) -> gdb.Value:
-    regexp = re.compile('(\.|->|\[)([a-zA-Z0-9_\]]*)(.*)')
-    while len(memberString) > 0:
-        match = regexp.match(memberString)
-        if not match:
-            raise Exception('Invalid member string "{}"'.format(memberString))
-        operator = match.group(1)
-        member = match.group(2)
-        memberString = match.group(3)
-        if operator == '.' or operator == '->':
-            if strictChecking:
-                if operator == '->' and value.type.code != gdb.TYPE_CODE_PTR:
-                    raise TypeError('Cannot access non-pointer with "->"')
-                if operator == '.' and value.type.code == gdb.TYPE_CODE_PTR:
-                    raise TypeError('Cannot access pointer with "."')
-            value = value[member]
-        elif operator == '[':
-            if strictChecking:
-                if member[-1] != '[':
-                    raise SyntaxError('Missing ] in index expression "[{}"'.format(member))
-            idx = int(member[:-1])
-            if value.type.code != gdb.TYPE_CODE_PTR and value.type.code != gdb.TYPE_CODE_ARRAY:
-                raise TypeError('Cannot index into non-pointer value {}'.format(value))
-            itemsize = value.type.target().sizeof
-            value = value[idx]
-        else:
-            assert False, 'Unknown operator "{}"'.format(operator)
-
-    return value
-
-class Member(PipeableCommand):
-    cmdName = 'member'
-    def __init__(self, arg=""):
-        super().__init__()
-        self.args = arg
-
-    def call(self, input : Iterable[gdb.Value]) -> Iterable[gdb.Value]:
-        for i in input:
-            yield parseMember(i, self.args)
-
 class Filter(PipeableCommand):
     cmdName = 'filter'
     def __init__(self, arg=""):
