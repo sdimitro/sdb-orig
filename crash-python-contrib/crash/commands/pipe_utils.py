@@ -53,18 +53,6 @@ class Null(PipeableCommand):
             pass
         return []
 
-class Echo(PipeableCommand):
-    cmdName = ['echo', 'cc']
-    def __init__(self, arg=""):
-        super().__init__()
-        self.arg = arg
-
-    def call(self, input : Iterable[gdb.Value]) -> Iterable[gdb.Value]:
-        for o in self.arg.split():
-            yield gdb.Value(int(o, 0))
-        for o in input:
-            yield o
-
 class Address(PipeableCommand):
     cmdName = 'address'
     def __init__(self, arg=""):
