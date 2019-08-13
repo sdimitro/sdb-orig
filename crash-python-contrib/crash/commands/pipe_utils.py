@@ -53,16 +53,6 @@ class Null(PipeableCommand):
             pass
         return []
 
-class Address(PipeableCommand):
-    cmdName = 'address'
-    def __init__(self, arg=""):
-        super().__init__()
-
-    def call(self, input : Iterable[gdb.Value]) -> Iterable[gdb.Value]:
-        for i in input:
-            assert i.address is not None
-            yield i.address
-
 class Array(PipeableCommand):
     cmdName = 'array'
     def __init__(self, arg : str = ""):
