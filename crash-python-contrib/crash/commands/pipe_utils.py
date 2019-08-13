@@ -27,25 +27,6 @@ class LineCount(PipeableCommand):
             i += 1
         yield gdb.Value(i)
 
-from collections import deque
-class Tail(PipeableCommand):
-    cmdName = 'tail'
-    def __init__(self, arg=""):
-        super().__init__()
-        try:
-            parser = argparse.ArgumentParser(prog='tail')
-            parser.add_argument('count', type=int, default=10, nargs='?')
-            self.args = parser.parse_args(gdb.string_to_argv(arg))
-        except:
-            pass
-
-    def call(self, input : Iterable[gdb.Value]) -> Iterable[gdb.Value]:
-        q : Deque[gdb.Value] = deque(maxlen=self.args.count)
-        for o in input:
-            q.append(o)
-        for o in q:
-            yield o
-
 import re
 def parseMember(value : gdb.Value, memberString : str, strictChecking : bool = False) -> gdb.Value:
     regexp = re.compile('(\.|->|\[)([a-zA-Z0-9_\]]*)(.*)')
