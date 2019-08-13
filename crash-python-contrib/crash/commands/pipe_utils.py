@@ -17,15 +17,6 @@ class Pipe(gdb.Command):
             print("    ", cmd)
 Pipe()
 
-class Type(PipeableCommand):
-    cmdName = 'type'
-    def __init__(self, arg : str = "") -> None:
-        super().__init__()
-    def call(self, input : Iterable[gdb.Value]) -> Iterable[gdb.Value]:
-        for o in input:
-            print(o.type)
-            yield o
-
 class LineCount(PipeableCommand):
     cmdName = 'wc'
     def __init__(self, arg : str = "") -> None:
