@@ -27,24 +27,6 @@ class LineCount(PipeableCommand):
             i += 1
         yield gdb.Value(i)
 
-class Head(PipeableCommand):
-    cmdName = 'head'
-    def __init__(self, arg : str = ""):
-        super().__init__()
-        try:
-            parser = argparse.ArgumentParser(prog='head')
-            parser.add_argument('count', type=int, default=10, nargs='?')
-            self.args = parser.parse_args(gdb.string_to_argv(arg))
-        except:
-            pass
-
-    def call(self, input : Iterable[gdb.Value]) -> Iterable[gdb.Value]:
-        for o in input:
-            if self.args.count == 0:
-                break
-            yield o
-            self.args.count -= 1
-
 from collections import deque
 class Tail(PipeableCommand):
     cmdName = 'tail'
