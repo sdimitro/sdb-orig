@@ -28,10 +28,6 @@ class Member(sdb.Command):
 
     names = ["member"]
 
-    def __init__(self, prog: drgn.Program, args: str = "") -> None:
-        super().__init__(prog, args)
-        self.args = args
-
     def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("members", nargs="+", metavar="<member>")
 
