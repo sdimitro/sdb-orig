@@ -14,11 +14,11 @@ $ python3 -m pip install pytest
 $ python3 -m pytest
 ```
 
-* [Black](https://black.readthedocs.io)
+* [yapf](https://github.com/google/yapf)
 ```
 $ python3 -m pip install black
 $ python3 -m black sdb
 ```
 
-`pylint`, `isort`, and `yapf` are also used to some extend, but are not
-required yet as there is still a lot of noise.
+`pylint`, `mypy`, and `isort` are also used to some extend, but
+are not required yet as there is still a lot of noise.

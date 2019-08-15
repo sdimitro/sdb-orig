@@ -36,4 +36,8 @@ class Echo(sdb.Command):
             yield obj
 
         for addr in self.args.addrs:
-            yield drgn.Object(self.prog, "void *", value=int(addr, 0))
+            try:
+                value_ = int(addr, 0)
+            except ValueError:
+                raise sdb.CommandInvalidInputError(self.name, addr)
+            yield drgn.Object(self.prog, "void *", value=value_)

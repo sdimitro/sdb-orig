@@ -74,6 +74,15 @@ class REPL:
                 for obj in objs:
                     print(obj)
 
+            except sdb.CommandArgumentsError:
+                #
+                # We skip printing anything for this specific error
+                # as argparse should have already printed a helpful
+                # message to the REPL for us.
+                #
+                continue
+            except sdb.Error as err:
+                print(err.text)
             except (EOFError, KeyboardInterrupt):
                 print(self.closing)
                 break

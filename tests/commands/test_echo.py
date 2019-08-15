@@ -1,30 +1,38 @@
+#
+# Copyright 2019 Delphix
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# pylint: disable=missing-docstring
+
 import drgn
 import pytest
 import sdb
 
-from typing import Iterable
-
-tplatform = drgn.Platform(drgn.Architecture.UNKNOWN,
-                          drgn.PlatformFlags.IS_LITTLE_ENDIAN)
-tprog = drgn.Program(tplatform)
+from tests import invoke, tprog
 
 
-def invoke(prog: drgn.Program, objs: Iterable[drgn.Object], line: str) -> Iterable[drgn.Object]:
-    """
-    Dispatch to sdb.invoke, but also drain the generator it returns, so
-    the tests can more easily access the returned objects.
-    """
-    return [i for i in sdb.invoke(prog, objs, line)]
-
-def test1():
+def test_empty():
     line = 'echo'
     objs = []
 
     ret = invoke(tprog, objs, line)
 
-    assert len(ret) == 0
+    assert not ret
 
-def test2():
+
+def test_piped_input():
     line = 'echo'
     objs = [drgn.Object(tprog, 'void *', value=0)]
 
@@ -34,7 +42,8 @@ def test2():
     assert ret[0].value_() == 0
     assert ret[0].type_ == tprog.type('void *')
 
-def test3():
+
+def test_single_arg_hex():
     line = 'echo 0x0'
     objs = []
 
@@ -44,7 +53,8 @@ def test3():
     assert ret[0].value_() == 0
     assert ret[0].type_ == tprog.type('void *')
 
-def test4():
+
+def test_single_arg_decimal():
     line = 'echo 0'
     objs = []
 
@@ -54,7 +64,18 @@ def test4():
     assert ret[0].value_() == 0
     assert ret[0].type_ == tprog.type('void *')
 
-def test5():
+
+def test_bogus_arg():
+    line = 'echo bogus'
+    objs = []
+
+    with pytest.raises(sdb.CommandInvalidInputError) as err:
+        invoke(tprog, objs, line)
+
+    assert err.value.argument == 'bogus'
+
+
+def test_test_piped_int():
     line = 'echo'
     objs = [drgn.Object(tprog, 'int', value=1)]
 
@@ -64,7 +85,8 @@ def test5():
     assert ret[0].value_() == 1
     assert ret[0].type_ == tprog.type('int')
 
-def test6():
+
+def test_single_arg():
     line = 'echo 1'
     objs = []
 
@@ -74,7 +96,8 @@ def test6():
     assert ret[0].value_() == 1
     assert ret[0].type_ == tprog.type('void *')
 
-def test7():
+
+def test_multiple_piped():
     line = 'echo'
     objs = [
         drgn.Object(tprog, 'void *', value=0),
@@ -89,7 +112,8 @@ def test7():
     assert ret[1].value_() == 1
     assert ret[1].type_ == tprog.type('int')
 
-def test8():
+
+def test_multiple_args():
     line = 'echo 0 1'
     objs = []
 
@@ -101,7 +125,8 @@ def test8():
     assert ret[1].value_() == 1
     assert ret[1].type_ == tprog.type('void *')
 
-def test9():
+
+def test_piped_and_args_combo():
     line = 'echo 0 1'
     objs = [
         drgn.Object(tprog, 'void *', value=0),
@@ -119,3 +144,25 @@ def test9():
     assert ret[2].type_ == tprog.type('void *')
     assert ret[3].value_() == 1
     assert ret[3].type_ == tprog.type('void *')
+
+
+def test_multi_echo_combo():
+    line = 'echo 2 3 | echo 4'
+    objs = [
+        drgn.Object(tprog, 'void *', value=0),
+        drgn.Object(tprog, 'int', value=1),
+    ]
+
+    ret = invoke(tprog, objs, line)
+
+    assert len(ret) == 5
+    assert ret[0].value_() == 0
+    assert ret[0].type_ == tprog.type('void *')
+    assert ret[1].value_() == 1
+    assert ret[1].type_ == tprog.type('int')
+    assert ret[2].value_() == 2
+    assert ret[2].type_ == tprog.type('void *')
+    assert ret[3].value_() == 3
+    assert ret[3].type_ == tprog.type('void *')
+    assert ret[4].value_() == 4
+    assert ret[4].type_ == tprog.type('void *')

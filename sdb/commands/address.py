@@ -43,12 +43,32 @@ class Address(sdb.Command):
     names = ["address", "addr"]
 
     def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
+        super()._init_argparse(parser)
         parser.add_argument("symbols", nargs="*", metavar="<symbol>")
 
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for obj in objs:
-            assert obj.address_of_() is not None
-            yield obj.address_of_()
+            if obj.address_ is None:
+                #
+                # This may not be very intuitive. How can we have
+                # an object that doesn't have an address? The answer
+                # is that this object was created from sdb (most
+                # probably through an echo command that is piped
+                # to us) and thus doesn't exist in the address space
+                # of our target. This is a weird and rare use-case
+                # but it keeps things simple for now. If we ever
+                # see this causing problems we should definitely
+                # rethink this as being the default behavior. An
+                # alternative for example could be that we throw
+                # an error that the object doesn't exist in the
+                # address space of the target.
+                #
+                yield obj
+            else:
+                yield obj.address_of_()
 
         for symbol in self.args.symbols:
-            yield resolve_for_address(self.prog, symbol)
+            try:
+                yield resolve_for_address(self.prog, symbol)
+            except KeyError:
+                raise sdb.SymbolNotFoundError(self.name, symbol)
