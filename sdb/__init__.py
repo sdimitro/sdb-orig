@@ -36,6 +36,7 @@ def register_command(name: str, class_: Type["sdb.Command"]) -> None:
 # pylint: disable=wrong-import-position,cyclic-import
 from sdb.command import *
 from sdb.coerce import *
+from sdb.error import *
 from sdb.locator import *
 from sdb.pretty_printer import *
 from sdb.walker import *
@@ -114,7 +115,6 @@ def invoke(prog: drgn.Program, first_input: Iterable[drgn.Object],
     import shlex
     import subprocess
     import sys
-    import traceback
 
     shell_cmd = None
     # Parse the argument string. Each pipeline stage is delimited by
@@ -148,18 +148,18 @@ def invoke(prog: drgn.Program, first_input: Iterable[drgn.Object],
     pipeline = []
     for stage in pipe_stages:
         (name, _, args) = stage.strip().partition(" ")
+        if name not in all_commands:
+            raise CommandNotFoundError(name)
         try:
             pipeline.append(all_commands[name](prog, args, name))
-        except KeyError:
-            print("sdb: cannot recognize command: {}".format(name))
-            return
         except SystemExit:
             # The passed in arguments to each command will be parsed in
             # the command object's constructor. We use "argparse" to do
             # the argument parsing, and when that detects an error, it
             # will throw this exception. Rather than exiting the entire
-            # SDB session, we only abort this specific pipeline.
-            return
+            # SDB session, we only abort this specific pipeline by raising
+            # a CommandArgumentsError.
+            raise CommandArgumentsError(name)
 
     pipeline[-1].islast = True
 
@@ -187,10 +187,6 @@ def invoke(prog: drgn.Program, first_input: Iterable[drgn.Object],
 
     except BrokenPipeError:
         pass
-    except Exception as err:  # pylint: disable=broad-except
-        traceback.print_exc()
-        print(err)
-        return
     finally:
         if shell_cmd is not None:
             sys.stdout = old_stdout

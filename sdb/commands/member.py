@@ -34,5 +34,13 @@ class Member(sdb.Command):
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for obj in objs:
             for member in self.args.members:
-                obj = obj.member_(member)
+                try:
+                    obj = obj.member_(member)
+                except (LookupError, TypeError) as err:
+                    #
+                    # The expected error messages that we get from
+                    # member_() are good enough to be propagated
+                    # as-is.
+                    #
+                    raise sdb.CommandError(self.name, str(err))
             yield obj

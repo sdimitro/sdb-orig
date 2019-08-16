@@ -34,7 +34,22 @@ class Command:
 
     # pylint: disable=too-few-public-methods
 
+    #
+    # names:
+    #    The potential names that can be used to invoke
+    #    the command.
+    #
     names: List[str] = []
+
+    #
+    # name:
+    #    The name used when the command was invoked. This
+    #    is generally used as a parameter passed to
+    #    exceptions raised by SDB to make error messages
+    #    more precise.
+    #
+    name: str = ""
+
     input_type: Optional[str] = None
 
     def __init__(self, prog: drgn.Program, args: str = "",

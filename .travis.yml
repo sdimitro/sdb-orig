@@ -11,6 +11,7 @@ install:
 
 script:
   - yapf --diff --style google --recursive sdb
+  - yapf --diff --style google --recursive tests
   - pylint -d duplicate-code sdb
   - pytest -v tests
 

@@ -34,7 +34,15 @@ class PyFilter(sdb.Command):
         if not self.args.expr:
             self.parser.error("the following arguments are required: expr")
 
-        self.code = compile(" ".join(self.args.expr), "<string>", "eval")
+        try:
+            self.code = compile(" ".join(self.args.expr), "<string>", "eval")
+        except SyntaxError as err:
+            spacing = list(' ' * len(err.text))
+            spacing[err.offset - 1] = '^'
+            indicator = ''.join(spacing)
+            raise sdb.CommandError(
+                self.name, "{}:\n\t{}\n\t{}".format(err.msg, err.text,
+                                                    indicator))
 
     def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("expr", nargs=argparse.REMAINDER)
@@ -43,4 +51,7 @@ class PyFilter(sdb.Command):
     def call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         # pylint: disable=eval-used
         func = lambda obj: eval(self.code, {'__builtins__': None}, {'obj': obj})
-        yield from filter(func, objs)
+        try:
+            yield from filter(func, objs)
+        except (TypeError, AttributeError) as err:
+            raise sdb.CommandError(self.name, str(err))
