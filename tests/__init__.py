@@ -83,6 +83,7 @@ def setup_basic_mock_program() -> drgn.Program:
             'test_struct': struct_type,
         }
         if name in mocked_types:
+            assert kind == mocked_types[name].kind
             return mocked_types[name]
         return None
 
@@ -118,6 +119,7 @@ def setup_basic_mock_program() -> drgn.Program:
             global_struct_addr: b'\x01\x00\x00\x00'
         }
         assert address in fake_mappings
+        assert count == len(fake_mappings[address])
         return fake_mappings[address]
 
     prog.add_memory_segment(0, 0xffffffffffffffff, fake_memory_reader)
@@ -128,7 +130,7 @@ def setup_basic_mock_program() -> drgn.Program:
 # Basic mock program to be used by the very primitive commands
 # like echo, address, member, cast, head, tail, filter, and help.
 #
-tprog = setup_basic_mock_program()
+MOCK_PROGRAM = setup_basic_mock_program()
 
 
 def invoke(prog: drgn.Program, objs: Iterable[drgn.Object],

@@ -19,14 +19,14 @@
 import pytest
 import sdb
 
-from tests import invoke, tprog
+from tests import invoke, MOCK_PROGRAM
 
 
 def test_empty():
     line = 'address'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert not ret
 
@@ -35,65 +35,65 @@ def test_single_object():
     line = 'addr global_int'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 0xffffffffc0a8aee0
-    assert ret[0].type_ == tprog.type('int *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('int *')
 
 
 def test_plain_address():
     line = 'addr 0xffffffffc084eee0'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 0xffffffffc084eee0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_multiple_object():
     line = 'addr global_int 0xffffffffc084eee0 global_void_ptr'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 3
     assert ret[0].value_() == 0xffffffffc0a8aee0
-    assert ret[0].type_ == tprog.type('int *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('int *')
     assert ret[1].value_() == 0xffffffffc084eee0
-    assert ret[1].type_ == tprog.type('void *')
+    assert ret[1].type_ == MOCK_PROGRAM.type('void *')
     assert ret[2].value_() == 0xffff88d26353c108
-    assert ret[2].type_ == tprog.type('void **')
+    assert ret[2].type_ == MOCK_PROGRAM.type('void **')
 
 
 def test_piped_invocations():
     line = 'addr global_int | addr 0xffffffffc084eee0 global_void_ptr'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 3
     assert ret[0].value_() == 0xffffffffc0a8aee0
-    assert ret[0].type_ == tprog.type('int *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('int *')
     assert ret[1].value_() == 0xffffffffc084eee0
-    assert ret[1].type_ == tprog.type('void *')
+    assert ret[1].type_ == MOCK_PROGRAM.type('void *')
     assert ret[2].value_() == 0xffff88d26353c108
-    assert ret[2].type_ == tprog.type('void **')
+    assert ret[2].type_ == MOCK_PROGRAM.type('void **')
 
 
 def test_echo_pipe():
     line = 'addr 0xffffffffc084eee0 | addr global_void_ptr'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 2
     assert ret[0].value_() == 0xffffffffc084eee0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
     assert ret[1].value_() == 0xffff88d26353c108
-    assert ret[1].type_ == tprog.type('void **')
+    assert ret[1].type_ == MOCK_PROGRAM.type('void **')
 
 
 def test_global_not_found():
@@ -101,6 +101,6 @@ def test_global_not_found():
     objs = []
 
     with pytest.raises(sdb.SymbolNotFoundError) as err:
-        invoke(tprog, objs, line)
+        invoke(MOCK_PROGRAM, objs, line)
 
     assert err.value.symbol == 'bogus'
