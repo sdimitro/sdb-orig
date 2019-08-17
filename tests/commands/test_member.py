@@ -20,7 +20,7 @@ import drgn
 import pytest
 import sdb
 
-from tests import invoke, tprog
+from tests import invoke, MOCK_PROGRAM
 
 
 def test_no_arg():
@@ -28,14 +28,14 @@ def test_no_arg():
     objs = []
 
     with pytest.raises(sdb.CommandArgumentsError):
-        invoke(tprog, objs, line)
+        invoke(MOCK_PROGRAM, objs, line)
 
 
 def test_arg_no_pipe_input():
     line = 'member int_member'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert not ret
 
@@ -45,7 +45,7 @@ def test_scalar_input():
     objs = []
 
     with pytest.raises(sdb.CommandError) as err:
-        invoke(tprog, objs, line)
+        invoke(MOCK_PROGRAM, objs, line)
 
     assert "'int' is not a structure or union" in str(err.value)
 
@@ -55,7 +55,7 @@ def test_member_not_found():
     objs = []
 
     with pytest.raises(sdb.CommandError) as err:
-        invoke(tprog, objs, line)
+        invoke(MOCK_PROGRAM, objs, line)
 
     assert "'struct test_struct' has no member 'bogus'" in str(err.value)
 
@@ -64,7 +64,9 @@ def test_one_member():
     line = 'addr global_struct | member ts_int'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
-    assert ret[0] == drgn.Object(tprog, tprog.type('int'), value=1)
+    assert ret[0] == drgn.Object(MOCK_PROGRAM,
+                                 MOCK_PROGRAM.type('int'),
+                                 value=1)

@@ -20,49 +20,49 @@ import drgn
 import pytest
 import sdb
 
-from tests import invoke, tprog
+from tests import invoke, MOCK_PROGRAM
 
 
 def test_empty():
     line = 'echo'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert not ret
 
 
 def test_piped_input():
     line = 'echo'
-    objs = [drgn.Object(tprog, 'void *', value=0)]
+    objs = [drgn.Object(MOCK_PROGRAM, 'void *', value=0)]
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_single_arg_hex():
     line = 'echo 0x0'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_single_arg_decimal():
     line = 'echo 0'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_bogus_arg():
@@ -70,99 +70,99 @@ def test_bogus_arg():
     objs = []
 
     with pytest.raises(sdb.CommandInvalidInputError) as err:
-        invoke(tprog, objs, line)
+        invoke(MOCK_PROGRAM, objs, line)
 
     assert err.value.argument == 'bogus'
 
 
 def test_test_piped_int():
     line = 'echo'
-    objs = [drgn.Object(tprog, 'int', value=1)]
+    objs = [drgn.Object(MOCK_PROGRAM, 'int', value=1)]
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 1
-    assert ret[0].type_ == tprog.type('int')
+    assert ret[0].type_ == MOCK_PROGRAM.type('int')
 
 
 def test_single_arg():
     line = 'echo 1'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 1
     assert ret[0].value_() == 1
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_multiple_piped():
     line = 'echo'
     objs = [
-        drgn.Object(tprog, 'void *', value=0),
-        drgn.Object(tprog, 'int', value=1),
+        drgn.Object(MOCK_PROGRAM, 'void *', value=0),
+        drgn.Object(MOCK_PROGRAM, 'int', value=1),
     ]
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 2
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
     assert ret[1].value_() == 1
-    assert ret[1].type_ == tprog.type('int')
+    assert ret[1].type_ == MOCK_PROGRAM.type('int')
 
 
 def test_multiple_args():
     line = 'echo 0 1'
     objs = []
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 2
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
     assert ret[1].value_() == 1
-    assert ret[1].type_ == tprog.type('void *')
+    assert ret[1].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_piped_and_args_combo():
     line = 'echo 0 1'
     objs = [
-        drgn.Object(tprog, 'void *', value=0),
-        drgn.Object(tprog, 'int', value=1),
+        drgn.Object(MOCK_PROGRAM, 'void *', value=0),
+        drgn.Object(MOCK_PROGRAM, 'int', value=1),
     ]
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 4
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
     assert ret[1].value_() == 1
-    assert ret[1].type_ == tprog.type('int')
+    assert ret[1].type_ == MOCK_PROGRAM.type('int')
     assert ret[2].value_() == 0
-    assert ret[2].type_ == tprog.type('void *')
+    assert ret[2].type_ == MOCK_PROGRAM.type('void *')
     assert ret[3].value_() == 1
-    assert ret[3].type_ == tprog.type('void *')
+    assert ret[3].type_ == MOCK_PROGRAM.type('void *')
 
 
 def test_multi_echo_combo():
     line = 'echo 2 3 | echo 4'
     objs = [
-        drgn.Object(tprog, 'void *', value=0),
-        drgn.Object(tprog, 'int', value=1),
+        drgn.Object(MOCK_PROGRAM, 'void *', value=0),
+        drgn.Object(MOCK_PROGRAM, 'int', value=1),
     ]
 
-    ret = invoke(tprog, objs, line)
+    ret = invoke(MOCK_PROGRAM, objs, line)
 
     assert len(ret) == 5
     assert ret[0].value_() == 0
-    assert ret[0].type_ == tprog.type('void *')
+    assert ret[0].type_ == MOCK_PROGRAM.type('void *')
     assert ret[1].value_() == 1
-    assert ret[1].type_ == tprog.type('int')
+    assert ret[1].type_ == MOCK_PROGRAM.type('int')
     assert ret[2].value_() == 2
-    assert ret[2].type_ == tprog.type('void *')
+    assert ret[2].type_ == MOCK_PROGRAM.type('void *')
     assert ret[3].value_() == 3
-    assert ret[3].type_ == tprog.type('void *')
+    assert ret[3].type_ == MOCK_PROGRAM.type('void *')
     assert ret[4].value_() == 4
-    assert ret[4].type_ == tprog.type('void *')
+    assert ret[4].type_ == MOCK_PROGRAM.type('void *')
