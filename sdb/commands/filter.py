@@ -65,10 +65,14 @@ class Filter(sdb.Command):
             raise sdb.CommandInvalidInputError(
                 self.name, "right hand side of expression is missing")
 
-        self.lhs_code = compile(" ".join(self.args.expr[:index]), "<string>",
-                                "eval")
-        self.rhs_code = compile(" ".join(self.args.expr[index + 1:]),
-                                "<string>", "eval")
+        try:
+            self.lhs_code = compile(" ".join(self.args.expr[:index]),
+                                    "<string>", "eval")
+            self.rhs_code = compile(" ".join(self.args.expr[index + 1:]),
+                                    "<string>", "eval")
+        except SyntaxError as err:
+            raise sdb.CommandEvalSyntaxError(self.name, err)
+
         self.compare = self.args.expr[index]
 
     def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
@@ -107,5 +111,5 @@ class Filter(sdb.Command):
                             'rhs': rhs
                         }):
                     yield obj
-        except TypeError as err:
+        except (AttributeError, TypeError, ValueError) as err:
             raise sdb.CommandError(self.name, str(err))

@@ -81,3 +81,15 @@ class CommandArgumentsError(CommandError):
     def __init__(self, command: str) -> None:
         super().__init__(command,
                          'invalid input. Use -h to get argument description')
+
+
+class CommandEvalSyntaxError(CommandError):
+    # pylint: disable=too-few-public-methods
+    # pylint: disable=missing-docstring
+
+    def __init__(self, command: str, err: SyntaxError) -> None:
+        spacing = list(' ' * len(err.text))
+        spacing[err.offset - 1] = '^'
+        indicator = ''.join(spacing)
+        super().__init__(command,
+                         "{}:\n\t{}\n\t{}".format(err.msg, err.text, indicator))

@@ -37,12 +37,7 @@ class PyFilter(sdb.Command):
         try:
             self.code = compile(" ".join(self.args.expr), "<string>", "eval")
         except SyntaxError as err:
-            spacing = list(' ' * len(err.text))
-            spacing[err.offset - 1] = '^'
-            indicator = ''.join(spacing)
-            raise sdb.CommandError(
-                self.name, "{}:\n\t{}\n\t{}".format(err.msg, err.text,
-                                                    indicator))
+            raise sdb.CommandEvalSyntaxError(self.name, err)
 
     def _init_argparse(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("expr", nargs=argparse.REMAINDER)
