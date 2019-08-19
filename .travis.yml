@@ -13,7 +13,7 @@ script:
   - yapf --diff --style google --recursive sdb
   - yapf --diff --style google --recursive tests
   - pylint -d duplicate-code sdb
-  - pylint tests
+  - pylint -d duplicate-code tests
   - pytest -v tests
   - python3 setup.py install
 
