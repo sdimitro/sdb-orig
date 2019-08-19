@@ -16,6 +16,8 @@
 
 # pylint: disable=missing-docstring
 
+import atexit
+import os
 import readline
 
 import sdb
@@ -54,8 +56,18 @@ class REPL:
         self.closing = closing
         self.vocabulary = vocabulary
         self.target = target
+
+        histfile = os.path.expanduser('~/.sdb_history')
+        try:
+            readline.read_history_file(histfile)
+        except FileNotFoundError:
+            pass
+
         readline.parse_and_bind("tab: complete")
+        readline.set_history_length(1000)
         readline.set_completer(REPL.__make_completer(vocabulary))
+
+        atexit.register(readline.write_history_file, histfile)
 
     def run(self):
         """
